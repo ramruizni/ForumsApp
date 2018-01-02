@@ -10,8 +10,11 @@ import android.widget.ListView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,22 +24,13 @@ public class ContactsActivity extends AppCompatActivity {
     ListView contactsList;
     ArrayList<String> contacts;
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
         contactsList = findViewById(R.id.contactsList);
-
         contacts = new ArrayList<>();
-        contacts.add("alroruni16@gmail.com");
-        contacts.add("ramruizni@gmail.com");
-        contacts.add("ramruizni@unal.edu.co");
-
         contactsList.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, contacts));
         contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -46,14 +40,20 @@ public class ContactsActivity extends AppCompatActivity {
         });
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("contactsList");
+        DatabaseReference ref = database.getReference("contactsList/thisisTheKey1");
 
-        HashMap<String, ArrayList> mainDict = new HashMap<>();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    contacts.add(child.toString());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        mainDict.put("thisisTheKey1", contacts);
-        mainDict.put("thisisAnotherKey", contacts);
-        ref.setValue(mainDict);
-
+            }
+        });
 
     }
 

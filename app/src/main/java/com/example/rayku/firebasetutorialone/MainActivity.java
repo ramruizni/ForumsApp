@@ -14,6 +14,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -33,6 +38,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.loginBtn).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("contactsList");
+
+        HashMap<String, ArrayList> mainDict = new HashMap<>();
+
+        ArrayList<String> contacts = new ArrayList<>();
+
+        contacts.add("alroruni16@gmail.com");
+        contacts.add("ramruizni@gmail.com");
+        contacts.add("ramruizni@unal.edu.co");
+
+        mainDict.put("thisisTheKey1", contacts);
+        mainDict.put("thisisAnotherKey", contacts);
+        ref.setValue(mainDict);
+
     }
 
     private void userLogin(){
