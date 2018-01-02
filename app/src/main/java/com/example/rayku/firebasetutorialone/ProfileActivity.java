@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,6 +59,37 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         saveBtn.setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
+
+
+        loadUserInformation();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mAuth.getCurrentUser()==null){
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+
+    private void loadUserInformation() {
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if(user!=null) {
+            if (user.getPhotoUrl() != null) {
+                Glide.with(this)
+                        .load(user.getPhotoUrl().toString())
+                        .into(profilePic);
+            }
+            if (user.getDisplayName() != null) {
+                displayName.setText(user.getDisplayName());
+            }
+        }
+
+
 
     }
 

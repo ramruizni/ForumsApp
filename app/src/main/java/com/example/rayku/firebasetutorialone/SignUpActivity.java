@@ -84,9 +84,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                            finish();
+                            startActivity(new Intent(SignUpActivity.this, ProfileActivity.class));
                         } else{
 
                             if(task.getException() instanceof FirebaseAuthUserCollisionException)
@@ -109,6 +108,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case(R.id.toLogIn):
+                finish();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 break;
         }
