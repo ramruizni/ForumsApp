@@ -7,6 +7,18 @@
     tools:context="com.example.rayku.firebasetutorialone.MainActivity">
 
 
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="180dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/logEmail"
         android:layout_width="match_parent"
@@ -33,20 +45,20 @@
         app:layout_constraintTop_toBottomOf="@+id/logEmail" />
 
     <Button
-        android:id="@+id/mainLogIn"
+        android:id="@+id/loginBtn"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        android:text="Login"
+        android:text="Log In"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logPwd" />
 
-    <Button
-        android:id="@+id/mainSignUp"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/toSignUp"
+        android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
@@ -54,6 +66,6 @@
         android:text="Don't have an account? Sign Up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainLogIn" />
+        app:layout_constraintTop_toBottomOf="@+id/loginBtn" />
 
 </android.support.constraint.ConstraintLayout>

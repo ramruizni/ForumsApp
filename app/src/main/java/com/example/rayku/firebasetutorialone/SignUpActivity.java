@@ -1,5 +1,6 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener{
@@ -25,6 +27,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     ProgressBar progressBar;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +39,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         mAuth = FirebaseAuth.getInstance();
 
-        findViewById(R.id.signSignUp).setOnClickListener(this);
+        findViewById(R.id.signUpBtn).setOnClickListener(this);
+        findViewById(R.id.toLogIn).setOnClickListener(this);
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -73,16 +78,22 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         progressBar.setVisibility(View.VISIBLE);
 
-
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "User Registered Successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
                         } else{
-                            Toast.makeText(getApplicationContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
+
+                            if(task.getException() instanceof FirebaseAuthUserCollisionException)
+                                Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
                         }
                     }
                 });
@@ -93,8 +104,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case(R.id.signSignUp):
+            case(R.id.signUpBtn):
                 registerUser();
+                break;
+
+            case(R.id.toLogIn):
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 break;
         }
     }
