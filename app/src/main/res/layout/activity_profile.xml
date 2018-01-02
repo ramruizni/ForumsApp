@@ -42,4 +42,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="73dp" />
 
+    <Button
+        android:id="@+id/toChatsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/saveBtn"
+        android:layout_below="@+id/saveBtn"
+        android:text="toChats" />
+
 </RelativeLayout>

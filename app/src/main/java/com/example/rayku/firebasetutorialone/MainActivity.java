@@ -14,15 +14,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
-
-    EditText logEmail, logPwd;
-
-    ProgressBar progressBar2;
+    private EditText logEmail, logPwd;
+    private ProgressBar progressBar2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +28,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         logEmail = findViewById(R.id.logEmail);
         logPwd = findViewById(R.id.logPwd);
-
+        progressBar2 = findViewById(R.id.progressBar2);
         findViewById(R.id.toSignUp).setOnClickListener(this);
         findViewById(R.id.loginBtn).setOnClickListener(this);
-        progressBar2 = findViewById(R.id.progressBar2);
-
 
         mAuth = FirebaseAuth.getInstance();
     }
 
     private void userLogin(){
+
+        progressBar2.setVisibility(View.VISIBLE);
+
         String email = logEmail.getText().toString().trim();
         String password = logPwd.getText().toString().trim();
 
@@ -68,17 +66,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        progressBar2.setVisibility(View.VISIBLE);
-
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar2.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                     finish();
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                 } else{
                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -92,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         if(mAuth.getCurrentUser()!=null){
             finish();
-            startActivity(new Intent(this, ProfileActivity.class));
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
     }
 
@@ -101,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.toSignUp:
                 finish();
-                startActivity(new Intent(this, SignUpActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
                 break;
 
             case(R.id.loginBtn):

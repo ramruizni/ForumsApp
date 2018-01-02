@@ -30,19 +30,26 @@ import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener{
 
-    ImageView profilePic;
-    EditText displayName;
-    Button saveBtn;
+    private ImageView profilePic;
+    private EditText displayName;
+    private Button saveBtn, toChatsBtn;
+    private ProgressBar progressBar3;
 
-    Uri uriProfileImage;
+    private Uri uriProfileImage;
+    private String profilePicUrl;
 
-    ProgressBar progressBar3;
-
-    String profilePicUrl;
-
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
 
     private static final int CHOOSE_IMAGE = 101;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mAuth.getCurrentUser()==null){
+            finish();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,31 +60,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         displayName = findViewById(R.id.displayName);
         saveBtn = findViewById(R.id.saveBtn);
         progressBar3 = findViewById(R.id.progressBar3);
-        progressBar3.setVisibility(View.GONE);
-
+        toChatsBtn = findViewById(R.id.toChatsBtn);
         profilePic.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
+        toChatsBtn.setOnClickListener(this);
+
+        progressBar3.setVisibility(View.GONE);
 
         mAuth = FirebaseAuth.getInstance();
-
-
         loadUserInformation();
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(mAuth.getCurrentUser()==null){
-            finish();
-            startActivity(new Intent(this, MainActivity.class));
-        }
     }
 
     private void loadUserInformation() {
-
         FirebaseUser user = mAuth.getCurrentUser();
-
         if(user!=null) {
             if (user.getPhotoUrl() != null) {
                 Glide.with(this)
@@ -88,9 +83,22 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 displayName.setText(user.getDisplayName());
             }
         }
+    }
 
-
-
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.profilePic:
+                showImageChooser();
+                break;
+            case R.id.saveBtn:
+                saveUserInformation();
+                break;
+            case R.id.toChatsBtn:
+                finish();
+                startActivity(new Intent(getApplicationContext(), ContactsActivity.class));
+                break;
+        }
     }
 
     private void showImageChooser(){
@@ -98,25 +106,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), CHOOSE_IMAGE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            uriProfileImage = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
-                profilePic.setImageBitmap(bitmap);
-
-                uploadImageToFirebaseStorage();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     private void uploadImageToFirebaseStorage(){
@@ -128,20 +117,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             progressBar3.setVisibility(View.VISIBLE);
             profileImageRef.putFile(uriProfileImage)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressBar3.setVisibility(View.GONE);
-                    profilePicUrl = taskSnapshot.getDownloadUrl().toString();
-                    Toast.makeText(getApplicationContext(), "UPLOADED IMAGE BRO", Toast.LENGTH_SHORT).show();
-                }
-            })
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressBar3.setVisibility(View.GONE);
+                            profilePicUrl = taskSnapshot.getDownloadUrl().toString();
+                            Toast.makeText(getApplicationContext(), "UPLOADED IMAGE BRO", Toast.LENGTH_SHORT).show();
+                        }
+                    })
                     .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressBar3.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressBar3.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
 
     }
@@ -173,14 +162,22 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case R.id.profilePic:
-                showImageChooser();
-                break;
-            case R.id.saveBtn:
-                saveUserInformation();
-                break;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            uriProfileImage = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
+                profilePic.setImageBitmap(bitmap);
+
+                uploadImageToFirebaseStorage();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
+
 }
