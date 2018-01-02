@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "32173857783",
+    "firebase_url": "https://fir-tutorialone-157a7.firebaseio.com",
+    "project_id": "fir-tutorialone-157a7",
+    "storage_bucket": "fir-tutorialone-157a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32173857783:android:b8fb1c295ccdc848",
+        "android_client_info": {
+          "package_name": "com.example.rayku.firebasetutorialone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32173857783-dh40j7tigpf1ub275dobol8iumfmvjkm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChrWylzZ5piBs0W1ypGYMveSP9A8buCF4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
