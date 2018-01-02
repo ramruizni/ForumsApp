@@ -1,38 +1,26 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseReference DBref = FirebaseDatabase.getInstance().getReference();
+        findViewById(R.id.mainSignUp).setOnClickListener(this);
+    }
 
-        Map<String, String> values = new HashMap<>();
-
-        values.put("name", "rayku");
-
-        DBref.push().setValue(values, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
-                if(databaseError==null){
-                    Log.i("Info", "Save successful");
-                } else Log.i("Info", "Save failed");
-            }
-        });
-
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.mainSignUp:
+                startActivity(new Intent(this, SignUpActivity.class));
+                break;
+        }
     }
 }
