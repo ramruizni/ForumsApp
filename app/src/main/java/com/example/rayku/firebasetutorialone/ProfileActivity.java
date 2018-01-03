@@ -47,7 +47,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onStart();
         if(mAuth.getCurrentUser()==null){
             finish();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), LogInActivity.class));
         }
     }
 
