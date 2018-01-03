@@ -39,21 +39,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mAuth = FirebaseAuth.getInstance();
 
+        createDataBase();
+    }
+
+    private void createDataBase(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("contactsList");
 
-        HashMap<String, ArrayList> mainDict = new HashMap<>();
+        HashMap<String, HashMap> mainDict = new HashMap<>();
+        HashMap<String, ArrayList> contacts = new HashMap<>();
+        ArrayList<Message> chat = new ArrayList<>();
 
-        ArrayList<String> contacts = new ArrayList<>();
+        chat.add(new Message("Ke onda mi perro", true));
+        chat.add(new Message("Ola k aze", false));
+        chat.add(new Message("A lo bn?", false));
+        chat.add(new Message("No ze lo puedo kreeeeer", true));
+        chat.add(new Message("Chao ps", true));
 
-        contacts.add("alroruni16@gmail.com");
-        contacts.add("ramruizni@gmail.com");
-        contacts.add("ramruizni@unal.edu.co");
+        contacts.put("alroruni16@gmail%com", chat);
+        contacts.put("ramruizni@gmail%com", chat);
+        contacts.put("ramruizni@unal%edu%co", chat);
 
-        mainDict.put("thisisTheKey1", contacts);
-        mainDict.put("thisisAnotherKey", contacts);
+        mainDict.put("ramruizni@gmail%com", contacts);
+        mainDict.put("ramruizni@unal%edu%co", contacts);
         ref.setValue(mainDict);
-
     }
 
     private void userLogin(){
