@@ -17,7 +17,7 @@ public class ForumFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     ArrayList<String> chatsArrayList;
-    ListView chatsListView;
+    ListView listView;
     View rootView;
 
 
@@ -40,11 +40,13 @@ public class ForumFragment extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_list_item_1, chatsArrayList);
-        chatsListView = rootView.findViewById(R.id.chatsListView);
-        chatsListView.setAdapter(adapter);
+        listView = rootView.findViewById(R.id.listView);
 
-        TextView title = rootView.findViewById(R.id.forumTitle);
-        title.setText(Integer.toString(args.getInt("position")));
+        TextView textView = rootView.findViewById(R.id.forumTitle);
+        textView.setText(Integer.toString(args.getInt("position")));
+
+
+        listView.setAdapter(adapter);
 
         return rootView;
     }

@@ -27,7 +27,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
         });
 
 
-        ViewPager viewPager = findViewById(R.id.daIncluder).findViewById(R.id.viewPager);
+        ViewPager viewPager = findViewById(R.id.viewPager);
 
         ForumFragment[] frags = new ForumFragment[100];
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager(), frags);
