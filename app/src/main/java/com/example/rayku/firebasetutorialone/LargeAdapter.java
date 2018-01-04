@@ -6,20 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHolder> {
-    private static final int SIZE = 1000;
+
     private final List<String> items;
 
-    public static LargeAdapter newInstance(Context context) {
-        List<String> items = new ArrayList<>();
-        String format = "whatever?";
-        for (int i = 0; i < SIZE; i++) {
-            items.add(String.format(format, i + 1));
-        }
+    public static LargeAdapter newInstance(Context context, List<String> items) {
         return new LargeAdapter(items);
     }
 
@@ -48,7 +41,7 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
         private final TextView textView;
 
         public static ViewHolder newInstance(View itemView) {
-            TextView textView = (TextView) itemView.findViewById(android.R.id.text1);
+            TextView textView = itemView.findViewById(android.R.id.text1);
             return new ViewHolder(itemView, textView);
         }
 

@@ -5,8 +5,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ScrollingActivity extends AppCompatActivity implements ForumFragment.OnFragmentInteractionListener{
 
@@ -14,10 +18,10 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        createFakeDatabase();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -29,20 +33,41 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
 
         ViewPager viewPager = findViewById(R.id.viewPager);
 
-        ForumFragment[] frags = new ForumFragment[100];
-        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager(), frags);
+        ArrayList<ForumFragment> frags = new ArrayList<>();
 
-        try {
-            viewPager.setAdapter(adapter);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        viewPager.setCurrentItem(50);
+        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager(), frags, 10);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(5);
 
 
     }
 
+
+    private void createFakeDatabase(){
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("forums");
+
+        HashMap<String, HashMap<String, ArrayList<String>>> forums = new HashMap<>();
+        HashMap<String, ArrayList<String>> topics = new HashMap<>();
+        ArrayList<String> aTopic = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            aTopic.add("message" + Integer.toString(i));
+        }
+
+        for (int i = 0; i < 10; i++) {
+            topics.put("topic" + Integer.toString(i), aTopic);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            forums.put("forum" + Integer.toString(i), topics);
+        }
+
+        ref.setValue(forums);
+
+
+    }
 
 
 

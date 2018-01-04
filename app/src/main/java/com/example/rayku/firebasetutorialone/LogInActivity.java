@@ -43,6 +43,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void createDataBase(){
+
+        /*
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("contactsList");
 
@@ -63,6 +65,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mainDict.put("ramruizni@gmail%com", contacts);
         mainDict.put("ramruizni@unal%edu%co", contacts);
         ref.setValue(mainDict);
+
+        */
     }
 
     private void userLogin(){

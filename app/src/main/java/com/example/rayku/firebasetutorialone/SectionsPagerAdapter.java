@@ -8,31 +8,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private ForumFragment[] frags;
+    private ArrayList<ForumFragment> frags;
+    private int size;
 
-    SectionsPagerAdapter(FragmentManager fm, ForumFragment[] frags) {
+    SectionsPagerAdapter(FragmentManager fm, ArrayList<ForumFragment> frags, int size) {
         super(fm);
         this.frags = frags;
+        this.size = size;
     }
 
     @Override
     public Fragment getItem(int position) { return PlaceholderFragment.newInstance(); }
 
     @Override
-    public int getCount() { return frags.length; }
+    public int getCount() { return size; }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
 
         Bundle args = new Bundle();
-        args.putInt("pos", position);
+        args.putString("forumTitle", "forum" + Integer.toString(position));
 
-        frags[position] = (ForumFragment) createdFragment;
-        frags[position].setArguments(args);
+        frags.add((ForumFragment)createdFragment);
+
+        createdFragment.setArguments(args);
 
         return createdFragment;
     }

@@ -96,7 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.toChatsBtn:
                 finish();
-                startActivity(new Intent(getApplicationContext(), ContactsActivity.class));
+                startActivity(new Intent(getApplicationContext(), ScrollingActivity.class));
                 break;
         }
     }
