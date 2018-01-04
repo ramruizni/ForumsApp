@@ -40,6 +40,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
 
         viewPager.setCurrentItem(50);
 
+
     }
 
 
