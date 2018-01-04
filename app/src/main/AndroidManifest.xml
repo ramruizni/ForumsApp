@@ -40,7 +40,12 @@
             android:name=".Main22Activity"
             android:label="@string/title_activity_main22"
             android:theme="@style/AppTheme" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".AltActivity" />
+        <activity
+            android:name=".ScrollingActivity"
+            android:label="@string/title_activity_scrolling"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
