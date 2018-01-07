@@ -5,10 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import java.util.List;
+import java.util.Random;
 
 public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHolder> {
 
@@ -22,7 +21,7 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic, parent, false);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +40,11 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         String text = items.get(position);
         holder.setText(text);
+        holder.setRating();
+
+
+
+
     }
 
     @Override
@@ -50,19 +54,26 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
 
     public static final class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
+        private final TextView ratingView;
+        Random rand;
 
         public static ViewHolder newInstance(View itemView) {
-            TextView textView = itemView.findViewById(android.R.id.text1);
-            return new ViewHolder(itemView, textView);
+            TextView textView = itemView.findViewById(R.id.titleView);
+            TextView ratingView = itemView.findViewById(R.id.ratingView);
+            return new ViewHolder(itemView, textView, ratingView);
         }
 
-        private ViewHolder(View itemView, TextView textView) {
+        private ViewHolder(View itemView, TextView textView, TextView ratingView) {
             super(itemView);
             this.textView = textView;
+            this.ratingView = ratingView;
         }
 
         public void setText(CharSequence text) {
             textView.setText(text);
         }
+        public void setRating(){
+            rand = new Random();
+            ratingView.setText(Integer.toString(rand.nextInt(10000))); }
     }
 }
