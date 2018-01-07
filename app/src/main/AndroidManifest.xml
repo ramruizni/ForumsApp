@@ -46,6 +46,7 @@
             android:name=".ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme" />
+        <activity android:name=".TopicActivity"></activity>
     </application>
 
 </manifest>

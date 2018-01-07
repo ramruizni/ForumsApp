@@ -1,5 +1,6 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,33 +11,29 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private ArrayList<ForumFragment> frags;
-    private int size;
+    Context context;
+    ArrayList<String> userForums;
 
-    SectionsPagerAdapter(FragmentManager fm, ArrayList<ForumFragment> frags, int size) {
+    SectionsPagerAdapter(Context context, FragmentManager fm, ArrayList<String> userForums) {
         super(fm);
-        this.frags = frags;
-        this.size = size;
+        this.context = context;
+        this.userForums = userForums;
     }
 
     @Override
     public Fragment getItem(int position) { return PlaceholderFragment.newInstance(); }
 
     @Override
-    public int getCount() { return size; }
+    public int getCount() { return userForums.size(); }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
 
         Bundle args = new Bundle();
-        args.putString("forumTitle", "forum" + Integer.toString(position));
-
-        frags.add((ForumFragment)createdFragment);
-
+        args.putString("forumTitle", userForums.get(position));
         createdFragment.setArguments(args);
 
         return createdFragment;
@@ -44,7 +41,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return Integer.toString(position);
+        return userForums.get(position);
     }
 
     public static class PlaceholderFragment extends Fragment {

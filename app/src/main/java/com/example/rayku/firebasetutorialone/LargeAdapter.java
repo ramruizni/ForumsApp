@@ -1,28 +1,39 @@
 package com.example.rayku.firebasetutorialone;
 
-import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 import java.util.List;
 
 public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHolder> {
 
     private final List<String> items;
+    private final String forumTitle;
 
-    public static LargeAdapter newInstance(Context context, List<String> items) {
-        return new LargeAdapter(items);
-    }
-
-    private LargeAdapter(List<String> items) {
+    LargeAdapter(List<String> items, String forumTitle) {
         this.items = items;
+        this.forumTitle = forumTitle;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), TopicActivity.class);
+                intent.putExtra("forumTitle", forumTitle);
+                intent.putExtra("topicTitle", "topic0");
+                view.getContext().startActivity(intent);
+            }
+        });
+
         return ViewHolder.newInstance(view);
     }
 

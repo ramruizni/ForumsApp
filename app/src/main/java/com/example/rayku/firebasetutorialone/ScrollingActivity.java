@@ -1,25 +1,38 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ScrollingActivity extends AppCompatActivity implements ForumFragment.OnFragmentInteractionListener{
+
+    CollapsingToolbarLayout ctl;
+
+    ViewPager viewPager;
+    SectionsPagerAdapter adapter;
+
+    ArrayList<String> userForums;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        createFakeDatabase();
+        //createFakeDatabase();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -30,15 +43,42 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             }
         });
 
+        viewPager = findViewById(R.id.viewPager);
 
-        ViewPager viewPager = findViewById(R.id.viewPager);
+        ctl = findViewById(R.id.toolbar_layout);
 
-        ArrayList<ForumFragment> frags = new ArrayList<>();
+        userForums = new ArrayList<>();
 
-        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager(), frags, 10);
+
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".", "%");
+
+
+        adapter = new SectionsPagerAdapter(getApplicationContext(), getSupportFragmentManager(), userForums);
         viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(5);
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("userPicks/"+userEmail);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    userForums.add(child.getValue().toString());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) { ctl.setTitle(adapter.getPageTitle(position)); }
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
 
     }
 
@@ -46,7 +86,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
     private void createFakeDatabase(){
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("forums");
+        DatabaseReference refForums = database.getReference("forums");
 
         HashMap<String, HashMap<String, ArrayList<String>>> forums = new HashMap<>();
         HashMap<String, ArrayList<String>> topics = new HashMap<>();
@@ -64,7 +104,25 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             forums.put("forum" + Integer.toString(i), topics);
         }
 
-        ref.setValue(forums);
+        refForums.setValue(forums);
+
+        DatabaseReference refUserPicks = database.getReference("userPicks");
+
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".","%");
+
+        ArrayList<String> picks = new ArrayList<>();
+        picks.add("forum3");
+        picks.add("forum5");
+        picks.add("forum6");
+        picks.add("forum9");
+        picks.add("forum1");
+
+        HashMap<String, ArrayList<String>> userPicks = new HashMap<>();
+        userPicks.put(userEmail, picks);
+
+        refUserPicks.setValue(userPicks);
+
+
 
 
     }
