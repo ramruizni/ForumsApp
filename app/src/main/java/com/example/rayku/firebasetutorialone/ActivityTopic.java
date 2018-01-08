@@ -14,7 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class TopicActivity extends AppCompatActivity {
+public class ActivityTopic extends AppCompatActivity {
 
     ArrayList<String> messages;
     ArrayAdapter adapter;

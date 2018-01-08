@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.rayku.firebasetutorialone.ProfileActivity">
+    tools:context="com.example.rayku.firebasetutorialone.ActivityProfile">
 
     <ImageView
-        android:id="@+id/profilePic"
+        android:id="@+id/profileImage"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="120dp"
-        app:srcCompat="@drawable/profile_pic" />
+        android:contentDescription="@string/description"/>
 
     <EditText
         android:id="@+id/displayName"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profilePic"
+        android:layout_below="@+id/profileImage"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
-        android:hint="Enter display Name" />
+        android:hint="@string/enter_display_name" />
 
     <Button
         android:id="@+id/saveBtn"
@@ -31,14 +30,14 @@
         android:layout_below="@+id/displayName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
-        android:text="Save" />
+        android:text="@string/save" />
 
     <ProgressBar
         android:id="@+id/progressBar3"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/profilePic"
+        android:layout_alignTop="@+id/profileImage"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="73dp" />
 
@@ -48,6 +47,6 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/saveBtn"
         android:layout_below="@+id/saveBtn"
-        android:text="toChats" />
+        android:text="@string/tochats" />
 
 </RelativeLayout>

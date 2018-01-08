@@ -15,7 +15,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener{
+public class ActivitySignup extends AppCompatActivity implements View.OnClickListener{
 
     private EditText signEmail, signPwd;
     private FirebaseAuth mAuth;
@@ -44,7 +44,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
             case(R.id.toLogIn):
                 finish();
-                startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+                startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
                 break;
         }
     }
@@ -87,7 +87,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         progressBar.setVisibility(View.GONE);
                         if(task.isSuccessful()) {
                             finish();
-                            startActivity(new Intent(SignUpActivity.this, ProfileActivity.class));
+                            startActivity(new Intent(ActivitySignup.this, ActivityProfile.class));
                         }else{
                             if(task.getException() instanceof FirebaseAuthUserCollisionException)
                                 Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();

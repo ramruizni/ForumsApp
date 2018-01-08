@@ -2,6 +2,7 @@ package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,14 +12,12 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-public class SectionsPagerAdapter extends FragmentPagerAdapter {
+public class AdapterSectionsPager extends FragmentPagerAdapter {
 
-    Context context;
     private ArrayList<String> userForums;
 
-    SectionsPagerAdapter(Context context, FragmentManager fm, ArrayList<String> userForums) {
+    AdapterSectionsPager(FragmentManager fm, ArrayList<String> userForums) {
         super(fm);
-        this.context = context;
         this.userForums = userForums;
     }
 
@@ -28,6 +27,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() { return userForums.size(); }
 
+    @NonNull
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
@@ -49,11 +49,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public PlaceholderFragment() { }
 
         public static Fragment newInstance() {
-            return new ForumFragment();
+            return new FragmentForum();
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             return inflater.inflate(R.layout.fragment_forum, container, false);
         }
     }

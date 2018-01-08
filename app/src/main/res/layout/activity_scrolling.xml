@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.rayku.firebasetutorialone.ScrollingActivity">
+    tools:context="com.example.rayku.firebasetutorialone.ActivityScrolling">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:title="TITLE BABY"/>
+                app:title="TITLE BABY" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|center"
-        app:srcCompat="@drawable/plus" />
+        app:srcCompat="@drawable/search" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/rightBtn"
@@ -77,6 +77,6 @@
         android:layout_marginEnd="70dp"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/search" />
+        app:srcCompat="@drawable/plus" />
 
 </android.support.design.widget.CoordinatorLayout>

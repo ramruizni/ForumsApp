@@ -13,8 +13,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,9 +26,9 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener{
+public class ActivityProfile extends AppCompatActivity implements View.OnClickListener{
 
-    private ImageView profilePic;
+    private ImageView profileImage;
     private EditText displayName;
     private Button saveBtn, toChatsBtn;
     private ProgressBar progressBar3;
@@ -47,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onStart();
         if(mAuth.getCurrentUser()==null){
             finish();
-            startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+            startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
         }
     }
 
@@ -56,12 +54,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        profilePic = findViewById(R.id.profilePic);
+        profileImage = findViewById(R.id.profileImage);
         displayName = findViewById(R.id.displayName);
         saveBtn = findViewById(R.id.saveBtn);
         progressBar3 = findViewById(R.id.progressBar3);
         toChatsBtn = findViewById(R.id.toChatsBtn);
-        profilePic.setOnClickListener(this);
+        profileImage.setOnClickListener(this);
         saveBtn.setOnClickListener(this);
         toChatsBtn.setOnClickListener(this);
 
@@ -75,9 +73,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         FirebaseUser user = mAuth.getCurrentUser();
         if(user!=null) {
             if (user.getPhotoUrl() != null) {
-                Glide.with(this)
+                GlideApp.with(this)
                         .load(user.getPhotoUrl().toString())
-                        .into(profilePic);
+                        .into(profileImage);
             }
             if (user.getDisplayName() != null) {
                 displayName.setText(user.getDisplayName());
@@ -88,7 +86,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         switch(view.getId()){
-            case R.id.profilePic:
+            case R.id.profileImage:
                 showImageChooser();
                 break;
             case R.id.saveBtn:
@@ -96,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.toChatsBtn:
                 finish();
-                startActivity(new Intent(getApplicationContext(), ScrollingActivity.class));
+                startActivity(new Intent(getApplicationContext(), ActivityScrolling.class));
                 break;
         }
     }
@@ -111,7 +109,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private void uploadImageToFirebaseStorage(){
 
         StorageReference profileImageRef = FirebaseStorage.getInstance()
-                .getReference("profilepics/"+System.currentTimeMillis() + ".jpg");
+                .getReference("profileImages/"+
+                        mAuth.getCurrentUser()
+                        .getEmail()
+                        .replace(".", "%")
+                        + ".jpg");
 
         if(uriProfileImage!=null){
             progressBar3.setVisibility(View.VISIBLE);
@@ -121,7 +123,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressBar3.setVisibility(View.GONE);
                             profilePicUrl = taskSnapshot.getDownloadUrl().toString();
-                            Toast.makeText(getApplicationContext(), "UPLOADED IMAGE BRO", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Upload Successful!", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -155,7 +157,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful())
-                        Toast.makeText(getApplicationContext(), "Profile Updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -168,8 +170,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
             uriProfileImage = data.getData();
             try {
+
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
-                profilePic.setImageBitmap(bitmap);
+                profileImage.setImageBitmap(bitmap);
 
                 uploadImageToFirebaseStorage();
 
@@ -179,5 +182,4 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
 
     }
-
 }

@@ -14,13 +14,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-public class LogInActivity extends AppCompatActivity implements View.OnClickListener{
+public class ActivityLogin extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
     private EditText logEmail, logPwd;
@@ -40,33 +35,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mAuth = FirebaseAuth.getInstance();
 
         //createDataBase();
-    }
-
-    private void createDataBase(){
-
-        /*
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("contactsList");
-
-        HashMap<String, HashMap> mainDict = new HashMap<>();
-        HashMap<String, ArrayList> contacts = new HashMap<>();
-        ArrayList<Message> chat = new ArrayList<>();
-
-        chat.add(new Message("Ke onda mi perro", true));
-        chat.add(new Message("Ola k aze", false));
-        chat.add(new Message("A lo bn?", false));
-        chat.add(new Message("No ze lo puedo kreeeeer", true));
-        chat.add(new Message("Chao ps", true));
-
-        contacts.put("alroruni16@gmail%com", chat);
-        contacts.put("ramruizni@gmail%com", chat);
-        contacts.put("ramruizni@unal%edu%co", chat);
-
-        mainDict.put("ramruizni@gmail%com", contacts);
-        mainDict.put("ramruizni@unal%edu%co", contacts);
-        ref.setValue(mainDict);
-
-        */
     }
 
     private void userLogin(){
@@ -106,7 +74,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 progressBar2.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                     finish();
-                    startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                    startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
                 } else{
                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -120,7 +88,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         super.onStart();
         if(mAuth.getCurrentUser()!=null){
             finish();
-            startActivity(new Intent(getApplicationContext(), ScrollingActivity.class));
+            startActivity(new Intent(getApplicationContext(), ActivityScrolling.class));
         }
     }
 
@@ -129,7 +97,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.toSignUp:
                 finish();
-                startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
+                startActivity(new Intent(getApplicationContext(), ActivitySignup.class));
                 break;
 
             case(R.id.loginBtn):

@@ -10,15 +10,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Random;
 
-public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHolder> {
+public final class AdapterLarge extends RecyclerView.Adapter<AdapterLarge.ViewHolder> {
 
     private final List<String> items;
     private final String forumTitle;
     private final Context context;
 
-    LargeAdapter(List<String> items, String forumTitle, Context context) {
+    AdapterLarge(List<String> items, String forumTitle, Context context) {
         this.items = items;
         this.forumTitle = forumTitle;
         this.context = context;
@@ -31,7 +30,7 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), TopicActivity.class);
+                Intent intent = new Intent(view.getContext(), ActivityTopic.class);
                 intent.putExtra("forumTitle", forumTitle);
                 intent.putExtra("topicTitle", "topic0");
                 view.getContext().startActivity(intent);
