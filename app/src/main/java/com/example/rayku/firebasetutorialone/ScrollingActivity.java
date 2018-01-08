@@ -46,7 +46,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        //createFakeDatabase();
+        createFakeDatabase();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -111,11 +111,11 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             aTopic.add("message" + Integer.toString(i));
         }
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             topics.put("topic" + Integer.toString(i), aTopic);
         }
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             forums.put("forum" + Integer.toString(i), topics);
         }
 
@@ -126,7 +126,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
         String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".","%");
 
         ArrayList<String> picks = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             picks.add("forum"+Integer.toString(i));
         }
 
@@ -142,11 +142,13 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference ref = storage.getReference();
+
         ref.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 ImageDownloader task = new ImageDownloader();
                 try {
+
                     Bitmap bitmap = task.execute(uri.toString()).get();
                     BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
                     ctl.setBackground(bitmapDrawable);

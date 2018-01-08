@@ -41,10 +41,6 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
         String text = items.get(position);
         holder.setText(text);
         holder.setRating();
-
-
-
-
     }
 
     @Override
@@ -57,7 +53,7 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
         private final TextView ratingView;
         Random rand;
 
-        public static ViewHolder newInstance(View itemView) {
+        static ViewHolder newInstance(View itemView) {
             TextView textView = itemView.findViewById(R.id.titleView);
             TextView ratingView = itemView.findViewById(R.id.ratingView);
             return new ViewHolder(itemView, textView, ratingView);
@@ -72,8 +68,11 @@ public final class LargeAdapter extends RecyclerView.Adapter<LargeAdapter.ViewHo
         public void setText(CharSequence text) {
             textView.setText(text);
         }
-        public void setRating(){
+
+        void setRating() {
             rand = new Random();
-            ratingView.setText(Integer.toString(rand.nextInt(10000))); }
+            ratingView.setText(Integer.toString(rand.nextInt(10000)));
+        }
+
     }
 }
