@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     Context context;
-    ArrayList<String> userForums;
+    private ArrayList<String> userForums;
 
     SectionsPagerAdapter(Context context, FragmentManager fm, ArrayList<String> userForums) {
         super(fm);

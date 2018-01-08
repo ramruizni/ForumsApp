@@ -1,6 +1,7 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +42,7 @@ public class ForumFragment extends Fragment {
         arguments = getArguments();
         forumTitle = arguments.getString("forumTitle");
 
-        adapter = new LargeAdapter(topics, forumTitle);
+        adapter = new LargeAdapter(topics, forumTitle, getContext()); // first with fragment context
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("forums/" + forumTitle);
@@ -65,6 +69,7 @@ public class ForumFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
 
         return rootView;
     }

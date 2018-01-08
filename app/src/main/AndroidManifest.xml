@@ -26,22 +26,7 @@
         </activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".ContactsActivity" />
-        <activity android:name=".ChatActivity" />
-        <activity
-            android:name=".ForumsActivity"
-            android:label="@string/title_activity_forums"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".Main2Activity"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".Main22Activity"
-            android:label="@string/title_activity_main22"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".AltActivity" />
+
         <activity
             android:name=".ScrollingActivity"
             android:label="@string/title_activity_scrolling"

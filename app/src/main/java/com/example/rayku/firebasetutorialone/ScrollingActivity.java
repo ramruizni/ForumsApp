@@ -1,24 +1,15 @@
 package com.example.rayku.firebasetutorialone;
 
-import android.content.ContentResolver;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,37 +32,35 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
 
     ArrayList<String> userForums;
 
+    ImageView titleImageView;
+
+    DatabaseReference databaseRef;
+    StorageReference storageRef;
+
+    String userEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        createFakeDatabase();
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //createFakeDatabase();
 
         viewPager = findViewById(R.id.viewPager);
-
         ctl = findViewById(R.id.toolbar_layout);
+        titleImageView = findViewById(R.id.imageView);
+
+        storageRef = FirebaseStorage.getInstance().getReference();
+        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".", "%");
+        databaseRef = FirebaseDatabase.getInstance().getReference("userPicks/"+userEmail);
+
 
         userForums = new ArrayList<>();
-
-        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".", "%");
 
         adapter = new SectionsPagerAdapter(getApplicationContext(), getSupportFragmentManager(), userForums);
         viewPager.setAdapter(adapter);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("userPicks/"+userEmail);
-
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot child : snapshot.getChildren()) {
@@ -87,7 +76,21 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             @Override
             public void onPageSelected(int position) {
                 ctl.setTitle(adapter.getPageTitle(position));
-                downloadImage("backgrounds/background" + Integer.toString(position)+".jpg");
+                String bgKey = "backgrounds/background" + Integer.toString(position)+".jpg";
+                storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        try {
+                            GlideApp.with(getApplicationContext())
+                                    .load(uri)
+                                    .fitCenter()
+                                    .into(titleImageView);
+                        } catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                });
             }
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
@@ -95,6 +98,14 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             public void onPageScrollStateChanged(int state) { }
         });
 
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
 
@@ -135,31 +146,6 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
 
         refUserPicks.setValue(userPicks);
 
-    }
-
-
-    public void downloadImage(String bgKey){
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference ref = storage.getReference();
-
-        ref.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                ImageDownloader task = new ImageDownloader();
-                try {
-
-                    Bitmap bitmap = task.execute(uri.toString()).get();
-                    BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
-                    ctl.setBackground(bitmapDrawable);
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-
-
-            }
-
-        });
     }
 
 
