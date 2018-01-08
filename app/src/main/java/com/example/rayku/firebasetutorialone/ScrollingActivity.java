@@ -9,7 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -19,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -53,7 +51,6 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
         storageRef = FirebaseStorage.getInstance().getReference();
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".", "%");
         databaseRef = FirebaseDatabase.getInstance().getReference("userPicks/"+userEmail);
-
 
         userForums = new ArrayList<>();
 
@@ -98,7 +95,7 @@ public class ScrollingActivity extends AppCompatActivity implements ForumFragmen
             public void onPageScrollStateChanged(int state) { }
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.midBtn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

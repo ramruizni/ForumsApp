@@ -20,11 +20,6 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="@android:color/black"
-
-
-
-
-
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -49,13 +44,39 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <ImageView
+        android:id="@+id/blackSquareFrame"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimary"
+        app:layout_anchor="@id/toolbar_layout"
+        app:layout_anchorGravity="bottom|start" />
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/leftBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="70dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|start"
+        app:srcCompat="@drawable/about" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/midBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|center"
+        app:srcCompat="@drawable/plus" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/rightBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="70dp"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/search" />
 
 </android.support.design.widget.CoordinatorLayout>
