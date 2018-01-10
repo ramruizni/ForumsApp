@@ -24,7 +24,7 @@ public class FragmentForum extends Fragment {
     ArrayList<String> topics;
     View rootView;
     RecyclerView recyclerView;
-    AdapterLarge adapter;
+    AdapterTopics adapter;
     Bundle arguments;
     String forumTitle;
 
@@ -39,7 +39,7 @@ public class FragmentForum extends Fragment {
         arguments = getArguments();
         forumTitle = arguments.getString("forumTitle");
 
-        adapter = new AdapterLarge(topics, forumTitle, getContext()); // first with fragment context
+        adapter = new AdapterTopics(topics, forumTitle, getContext()); // first with fragment context
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("forums/" + forumTitle);
@@ -66,7 +66,6 @@ public class FragmentForum extends Fragment {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
 
         return rootView;
     }

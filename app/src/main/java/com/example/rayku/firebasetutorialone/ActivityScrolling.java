@@ -55,7 +55,7 @@ public class ActivityScrolling extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        //createFakeDatabase();
+        createFakeDatabase();
 
         viewPager = findViewById(R.id.viewPager);
         ctl = findViewById(R.id.toolbar_layout);
@@ -83,7 +83,7 @@ public class ActivityScrolling extends AppCompatActivity
         });
 
         userForums = new ArrayList<>();
-        adapter = new AdapterSectionsPager(getApplicationContext(), getSupportFragmentManager(), userForums);
+        adapter = new AdapterSectionsPager(getSupportFragmentManager(), userForums);
         viewPager.setAdapter(adapter);
 
         storageRef = FirebaseStorage.getInstance().getReference();
@@ -158,12 +158,15 @@ public class ActivityScrolling extends AppCompatActivity
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference refForums = database.getReference("forums");
 
-        HashMap<String, HashMap<String, ArrayList<String>>> forums = new HashMap<>();
-        HashMap<String, ArrayList<String>> topics = new HashMap<>();
-        ArrayList<String> aTopic = new ArrayList<>();
+        HashMap<String, HashMap<String, ArrayList<Message>>> forums = new HashMap<>();
+        HashMap<String, ArrayList<Message>> topics = new HashMap<>();
+        ArrayList<Message> aTopic = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            aTopic.add("message" + Integer.toString(i));
+            if(i%2==0)
+                aTopic.add(new Message("ramruizni@unal%edu%co", "message_recieved" + Integer.toString(i)));
+            else
+                aTopic.add(new Message("me", "message_recieved" + Integer.toString(i)));
         }
 
         for (int i = 0; i < 10; i++) {

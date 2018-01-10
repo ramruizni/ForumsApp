@@ -8,16 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.List;
 
-public final class AdapterLarge extends RecyclerView.Adapter<AdapterLarge.ViewHolder> {
+public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> {
 
     private final List<String> items;
     private final String forumTitle;
     private final Context context;
 
-    AdapterLarge(List<String> items, String forumTitle, Context context) {
+    AdapterTopics(List<String> items, String forumTitle, Context context) {
         this.items = items;
         this.forumTitle = forumTitle;
         this.context = context;
@@ -32,7 +31,10 @@ public final class AdapterLarge extends RecyclerView.Adapter<AdapterLarge.ViewHo
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ActivityTopic.class);
                 intent.putExtra("forumTitle", forumTitle);
-                intent.putExtra("topicTitle", "topic0");
+
+                TextView titleView = view.findViewById(R.id.titleView);
+
+                intent.putExtra("topicTitle", titleView.getText());
                 view.getContext().startActivity(intent);
             }
         });
