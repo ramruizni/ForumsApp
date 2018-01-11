@@ -11,18 +11,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FragmentForum extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    ArrayList<String> topicTitles, lastMessages;
+    ArrayList<Topic> topics;
+
     View rootView;
     RecyclerView recyclerView;
     AdapterTopics adapter;
@@ -35,13 +38,12 @@ public class FragmentForum extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        topicTitles = new ArrayList<>();
-        lastMessages = new ArrayList<>();
+        topics = new ArrayList<>();
 
         arguments = getArguments();
         forumID = arguments.getString("forumID");
 
-        adapter = new AdapterTopics(topicTitles, lastMessages, forumID);
+        adapter = new AdapterTopics(topics, forumID, getActivity());
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("forumTopics/"+forumID);
 
@@ -49,14 +51,19 @@ public class FragmentForum extends Fragment {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot child : snapshot.getChildren()) {
-                    topicTitles.add(child.child("title").getValue(String.class));
-                    lastMessages.add(child.child("lastMessage").getValue(String.class));
+
+                    topics.add(new Topic(child.child("title").getValue(String.class),
+                            child.child("lastMessage").getValue(String.class),
+                            child.child("rating").getValue(Integer.class),
+                            child.getKey()));
+
                     adapter.notifyDataSetChanged();
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+
 
     }
 

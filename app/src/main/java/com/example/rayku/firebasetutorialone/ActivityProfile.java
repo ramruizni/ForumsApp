@@ -163,23 +163,5 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            uriProfileImage = data.getData();
-            try {
-
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
-                profileImage.setImageBitmap(bitmap);
-
-                uploadImageToFirebaseStorage();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 }

@@ -10,50 +10,65 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> {
 
-    private ArrayList<String> topicTitles, lastMessages;
-    private String forumID;
+    private ArrayList<Topic> topics;
 
-    AdapterTopics(ArrayList<String> topicTitles, ArrayList<String> lastMessages,
-                  String forumID ) {
-        this.topicTitles = topicTitles;
-        this.lastMessages = lastMessages;
+    private String forumID;
+    private Context context;
+
+    AdapterTopics(ArrayList<Topic> topics, String forumID, Context context) {
+        this.topics = topics;
         this.forumID = forumID;
+        this.context = context;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic, parent, false);
 
-
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ActivityTopic.class);
                 intent.putExtra("forumID", forumID);
+
+                TextView titleView = view.findViewById(R.id.titleView);
+                String topicTitle = titleView.getText().toString();
+                intent.putExtra("topicTitle", topicTitle);
+
+                TextView phantomView = view.findViewById(R.id.phantomCheatView);
+                String theCheat = phantomView.getText().toString();
+                intent.putExtra("topicID", theCheat);
+
+                context.startActivity(intent);
+
             }
         });
-
 
         return ViewHolder.newInstance(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String title = topicTitles.get(position);
-        String lastMessage = lastMessages.get(position);
+        String title = topics.get(position).title;
+        String lastMessage = topics.get(position).lastMessage;
+        int rating = topics.get(position).rating;
+        String phantomCheat = topics.get(position).ID;
+
         holder.setTitle(title);
         holder.setLastMessage(lastMessage);
-        holder.setRating();
+        holder.setRating(rating);
+        holder.cheatTheSystem(phantomCheat);
+
         holder.setImage();
+
     }
 
     @Override
     public int getItemCount() {
-        return topicTitles.size();
+        return topics.size();
     }
 
     public static final class ViewHolder extends RecyclerView.ViewHolder {
@@ -61,22 +76,25 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         private final TextView lastMessageView;
         private final TextView ratingView;
         private final ImageView imageView;
+        private final TextView phantomCheatView;
 
         static ViewHolder newInstance(View itemView) {
             TextView titleView = itemView.findViewById(R.id.titleView);
             TextView lastMessageView = itemView.findViewById(R.id.lastMessageView);
             TextView ratingView = itemView.findViewById(R.id.ratingView);
             ImageView imageView = itemView.findViewById(R.id.imageView);
-            return new ViewHolder(itemView, titleView, lastMessageView, ratingView, imageView);
+            TextView phantomCheatView = itemView.findViewById(R.id.phantomCheatView);
+            return new ViewHolder(itemView, titleView, lastMessageView, ratingView, imageView, phantomCheatView);
         }
 
         private ViewHolder(View itemView, TextView titleView, TextView lastMessageView,
-                           TextView ratingView, ImageView imageView) {
+                           TextView ratingView, ImageView imageView, TextView phantomCheatView) {
             super(itemView);
             this.titleView = titleView;
             this.lastMessageView = lastMessageView;
             this.ratingView = ratingView;
             this.imageView = imageView;
+            this.phantomCheatView = phantomCheatView;
         }
 
         public void setTitle(CharSequence text) {
@@ -96,9 +114,11 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
         }
 
-        void setRating() {
-            ratingView.setText("725");
+        void setRating(int rating) {
+            ratingView.setText(Integer.toString(rating));
         }
+        void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
 
     }
+
 }

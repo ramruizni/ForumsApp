@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,12 +32,11 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
     FirebaseDatabase database;
-    DatabaseReference ref;
+    DatabaseReference ref, lastMessageRef;
     Button emojiBtn, attachBtn, sendBtn;
     String currentUser;
     Toolbar toolbar;
-    String forumTitle;
-    String topicTitle;
+    String forumID, topicID, topicTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +52,10 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         attachBtn.setOnClickListener(this);
         sendBtn.setOnClickListener(this);
 
-        messages = new ArrayList<>();
 
         Bundle extras = getIntent().getExtras();
-
-        forumTitle = extras.get("forumTitle").toString();
+        forumID = extras.get("forumID").toString();
+        topicID = extras.get("topicID").toString();
         topicTitle = extras.get("topicTitle").toString();
 
         toolbar.setTitle(topicTitle);
@@ -76,9 +75,9 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
             }
         });
 
+        currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        currentUser = FirebaseAuth.getInstance().getCurrentUser().getEmail().toString();
-
+        messages = new ArrayList<>();
         adapter = new AdapterMessages(messages, this, currentUser);
         recyclerView.setAdapter(adapter);
 
@@ -86,20 +85,16 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        Toast.makeText(getApplicationContext(), forumTitle + " " + topicTitle, Toast.LENGTH_SHORT).show();
-
         database = FirebaseDatabase.getInstance();
-        ref = database.getReference("forums/" + forumTitle + "/" + topicTitle);
+        ref = database.getReference("topicMessages/"+topicID);
+        lastMessageRef = database.getReference("forumTopics/"+forumID+"/"+topicID);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-
                 for (DataSnapshot child : snapshot.getChildren()) {
-
                     String sender = child.child("sender").getValue(String.class);
                     String content = child.child("content").getValue(String.class);
-
                     messages.add(new Message(sender, content));
                     adapter.notifyDataSetChanged();
                 }
@@ -118,6 +113,9 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         ref.push().setValue(newMessage);
         messages.add(newMessage);
         adapter.notifyDataSetChanged();
+
+        lastMessageRef.child("lastMessage").setValue(input);
+
 
         View view = this.getCurrentFocus();
         if (view != null) {

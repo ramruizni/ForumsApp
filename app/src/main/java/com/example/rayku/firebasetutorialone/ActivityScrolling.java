@@ -1,9 +1,11 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,6 +30,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -39,27 +43,20 @@ public class ActivityScrolling extends AppCompatActivity
 
     CollapsingToolbarLayout ctl;
     Toolbar toolbar;
-
+    ImageView titleImageView;
     ViewPager viewPager;
     AdapterSectionsPager adapter;
-
     ArrayList<String> userForumIDs, userForumTitles;
-
-    ImageView titleImageView;
-
     DatabaseReference databaseRef;
     StorageReference storageRef;
-
     FloatingActionButton leftBtn, midBtn, rightBtn;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        //createFakeDatabase();
-
+        createFakeDatabase();
 
         viewPager = findViewById(R.id.viewPager);
         ctl = findViewById(R.id.toolbar_layout);
@@ -94,7 +91,6 @@ public class ActivityScrolling extends AppCompatActivity
         userForumTitles = new ArrayList<>();
 
         adapter = new AdapterSectionsPager(getSupportFragmentManager(), userForumIDs, userForumTitles);
-
         viewPager.setAdapter(adapter);
 
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -114,7 +110,7 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageSelected(int position) {
                 ctl.setTitle(adapter.getPageTitle(position));
-                String bgKey = "backgrounds/background" + Integer.toString(position)+".jpg";
+                String bgKey = "backgrounds/"+userForumIDs.get(position)+".jpg";
                 storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -135,9 +131,6 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
-
-
-
 
     }
 
@@ -212,12 +205,12 @@ public class ActivityScrolling extends AppCompatActivity
             userForums.put(userID, forums);
         refUserForums.setValue(userForums);
 
-
         //FORUM TOPICS
         HashMap<String, HashMap<String, Topic>> forumTopics = new HashMap<>();
         HashMap<String, Topic> topics = new HashMap<>();
         for (String topicID : topicIDs.keySet()) {
-            Topic topic = new Topic("Topic" + Integer.toString(rand.nextInt(10)), "WOW");
+            Topic topic = new Topic("Topic" + Integer.toString(rand.nextInt(10)),
+                    "WOW", rand.nextInt(10000), topicID);
             topics.put(topicID, topic);
         }
         for(String forumID : forumIDs.keySet())
@@ -227,9 +220,15 @@ public class ActivityScrolling extends AppCompatActivity
         //TOPIC MESSAGES
         HashMap<String, HashMap<String, Message>> topicMessages = new HashMap<>();
         HashMap<String, Message> messages = new HashMap<>();
+        int counter = 1;
         for (String messageID : messageIDs.keySet()) {
-            Message message = new Message("7etZQqIhtyM3PcFwchWXkF57wq33", "WOW");
-            messages.put(messageID, message);
+            if(counter==1)
+                messages.put(messageID, new Message("7etZQqIhtyM3PcFwchWXkF57wq33", "WOW"));
+            if(counter==2)
+                messages.put(messageID, new Message("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "WOW"));
+            if(counter==3)
+                messages.put(messageID, new Message("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", "WOW"));
+            counter++;
         }
         for(String topicID : topicIDs.keySet())
             topicMessages.put(topicID, messages);
