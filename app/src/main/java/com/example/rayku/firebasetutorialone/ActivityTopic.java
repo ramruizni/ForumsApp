@@ -1,18 +1,21 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +34,9 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
     DatabaseReference ref;
     Button emojiBtn, attachBtn, sendBtn;
     String currentUser;
+    Toolbar toolbar;
+    String forumTitle;
+    String topicTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +47,7 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         emojiBtn = findViewById(R.id.emojiBtn);
         attachBtn = findViewById(R.id.attachBtn);
         sendBtn = findViewById(R.id.sendBtn);
+        toolbar = findViewById(R.id.toolbar);
         emojiBtn.setOnClickListener(this);
         attachBtn.setOnClickListener(this);
         sendBtn.setOnClickListener(this);
@@ -49,8 +56,26 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
 
         Bundle extras = getIntent().getExtras();
 
-        String forumTitle = extras.get("forumTitle").toString();
-        String topicTitle = extras.get("topicTitle").toString();
+        forumTitle = extras.get("forumTitle").toString();
+        topicTitle = extras.get("topicTitle").toString();
+
+        toolbar.setTitle(topicTitle);
+
+        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.action_settings:
+                        Intent intent = new Intent(getApplicationContext(), ActivityTopicSettings.class);
+                        intent.putExtra("topicTitle", topicTitle);
+                        startActivity(intent);
+                        break;
+                }
+                return false;
+            }
+        });
+
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getEmail().toString();
 
@@ -83,8 +108,6 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
             public void onCancelled(DatabaseError databaseError) { }
         });
 
-
-
     }
 
     public void sendMessage(){
@@ -105,6 +128,13 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         recyclerView.scrollToPosition(messages.size()-1);
         editText.setText(null);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.my_menu, menu);
+        return true;
     }
 
     @Override

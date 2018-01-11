@@ -3,18 +3,22 @@ package com.example.rayku.firebasetutorialone;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class ActivityScrolling extends AppCompatActivity
         implements
@@ -56,6 +61,7 @@ public class ActivityScrolling extends AppCompatActivity
         setContentView(R.layout.activity_scrolling);
 
         createFakeDatabase();
+        /*
 
         viewPager = findViewById(R.id.viewPager);
         ctl = findViewById(R.id.toolbar_layout);
@@ -127,7 +133,7 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
-
+        */
     }
 
     @Override
@@ -156,42 +162,83 @@ public class ActivityScrolling extends AppCompatActivity
     private void createFakeDatabase(){
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        DatabaseReference refUsers = database.getReference("users");
         DatabaseReference refForums = database.getReference("forums");
+        DatabaseReference refTopics = database.getReference("topics");
+        DatabaseReference refMessages = database.getReference("messages");
 
-        HashMap<String, HashMap<String, ArrayList<Message>>> forums = new HashMap<>();
-        HashMap<String, ArrayList<Message>> topics = new HashMap<>();
-        ArrayList<Message> aTopic = new ArrayList<>();
+        DatabaseReference refUserForums = database.getReference("userForums");
+        DatabaseReference refForumTopics = database.getReference("forumTopics");
+        DatabaseReference refTopicMessages = database.getReference("topicMessages");
 
-        for (int i = 0; i < 10; i++) {
-            if(i%2==0)
-                aTopic.add(new Message("ramruizni@unal%edu%co", "message_recieved" + Integer.toString(i)));
-            else
-                aTopic.add(new Message("me", "message_recieved" + Integer.toString(i)));
+        refUsers.setValue(null);
+        refForums.setValue(null);
+        refTopics.setValue(null);
+        refMessages.setValue(null);
+
+        HashMap<String, Boolean> users = new HashMap<>();
+        users.put("7etZQqIhtyM3PcFwchWXkF57wq33", true);
+        users.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", true);
+        users.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
+        refUsers.setValue(users);
+
+        HashMap<String, Boolean> userIDs = new HashMap<>();
+        HashMap<String, Boolean> forumIDs = new HashMap<>();
+        HashMap<String, Boolean> topicIDs = new HashMap<>();
+        HashMap<String, Boolean> messageIDs = new HashMap<>();
+
+        userIDs.put("7etZQqIhtyM3PcFwchWXkF57wq33", true);
+        userIDs.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", true);
+        userIDs.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
+        forumIDs.put("-L2auVWUkz58XFqh5OsZ", true);
+        forumIDs.put("-L2auVWVgH6_ocD3d99v", true);
+        forumIDs.put("-L2auVWVgH6_ocD3d99y", true);
+        topicIDs.put("-L2auVWVgH6_ocD3d99t", true);
+        topicIDs.put("-L2auVWVgH6_ocD3d99w", true);
+        topicIDs.put("-L2auVWVgH6_ocD3d99z", true);
+        messageIDs.put("-L2auVWVgH6_ocD3d99u", true);
+        messageIDs.put("-L2auVWVgH6_ocD3d99x", true);
+        messageIDs.put("-L2auVWVgH6_ocD3d9A-", true);
+
+        refUsers.setValue(userIDs);
+        refForums.setValue(forumIDs);
+        refTopics.setValue(topicIDs);
+        refMessages.setValue(messageIDs);
+
+        HashMap<String, HashMap<String, Boolean>> userForums = new HashMap<>();
+        for(String userID : userIDs.keySet())
+            userForums.put(userID, forumIDs);
+        refUserForums.setValue(userForums);
+
+        HashMap<String, HashMap<String, Boolean>> forumTopics = new HashMap<>();
+        for(String forumID : forumIDs.keySet())
+            forumTopics.put(forumID, topicIDs);
+        refForumTopics.setValue(forumTopics);
+
+        HashMap<String, HashMap<String, Boolean>> topicMessages = new HashMap<>();
+        for(String topicID : topicIDs.keySet())
+            topicMessages.put(topicID, messageIDs);
+        refTopicMessages.setValue(topicMessages);
+
+        Random rand = new Random();
+
+        for(String forumID : forumIDs.keySet()){
+            Forum forum = new Forum("Forum"+Integer.toString(rand.nextInt(10)));
+            refForums.child(forumID).setValue(forum);
         }
 
-        for (int i = 0; i < 10; i++) {
-            topics.put("topic" + Integer.toString(i), aTopic);
+        for(String topicID : topicIDs.keySet()){
+            Topic topic = new Topic("Topic"+Integer.toString(rand.nextInt(10)), "lastMessage");
+            refTopics.child(topicID).setValue(topic);
         }
 
-        for (int i = 0; i < 10; i++) {
-            forums.put("forum" + Integer.toString(i), topics);
+        for(String messageID : messageIDs.keySet()){
+            Message message = new Message("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "Message"+Integer.toString(rand.nextInt(10)));
+            refMessages.child(messageID).setValue(message);
         }
 
-        refForums.setValue(forums);
 
-        DatabaseReference refUserPicks = database.getReference("userPicks");
-
-        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".","%");
-
-        ArrayList<String> picks = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            picks.add("forum"+Integer.toString(i));
-        }
-
-        HashMap<String, ArrayList<String>> userPicks = new HashMap<>();
-        userPicks.put(userEmail, picks);
-
-        refUserPicks.setValue(userPicks);
 
     }
 

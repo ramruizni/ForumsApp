@@ -30,6 +30,7 @@
         <activity android:name=".ActivityTopic" />
         <activity android:name=".ActivityInfo" />
         <activity android:name=".ActivityAddForum" />
+        <activity android:name=".ActivityTopicSettings"></activity>
     </application>
 
 </manifest>
