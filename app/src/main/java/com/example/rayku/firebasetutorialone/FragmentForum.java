@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,12 @@ public class FragmentForum extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    ArrayList<String> topics;
+    ArrayList<String> topicTitles, lastMessages;
     View rootView;
     RecyclerView recyclerView;
     AdapterTopics adapter;
     Bundle arguments;
-    String forumTitle;
+    String forumID;
 
     public FragmentForum(){ }
 
@@ -34,21 +35,22 @@ public class FragmentForum extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        topics = new ArrayList<>();
+        topicTitles = new ArrayList<>();
+        lastMessages = new ArrayList<>();
 
         arguments = getArguments();
-        forumTitle = arguments.getString("forumTitle");
+        forumID = arguments.getString("forumID");
 
-        adapter = new AdapterTopics(topics, forumTitle, getContext()); // first with fragment context
+        adapter = new AdapterTopics(topicTitles, lastMessages, forumID);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("forums/" + forumTitle);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("forumTopics/"+forumID);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot child : snapshot.getChildren()) {
-                    topics.add(child.getKey());
+                    topicTitles.add(child.child("title").getValue(String.class));
+                    lastMessages.add(child.child("lastMessage").getValue(String.class));
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -87,8 +89,5 @@ public class FragmentForum extends Fragment {
     }
 
     interface OnFragmentInteractionListener { }
-
-
-    public String getTitle(){ return forumTitle; }
 
 }

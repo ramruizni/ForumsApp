@@ -38,30 +38,28 @@ public class ActivityScrolling extends AppCompatActivity
         AdapterView.OnClickListener{
 
     CollapsingToolbarLayout ctl;
+    Toolbar toolbar;
 
     ViewPager viewPager;
     AdapterSectionsPager adapter;
 
-    ArrayList<String> userForums;
+    ArrayList<String> userForumIDs, userForumTitles;
 
     ImageView titleImageView;
 
     DatabaseReference databaseRef;
     StorageReference storageRef;
 
-    String userEmail;
-
     FloatingActionButton leftBtn, midBtn, rightBtn;
 
-    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        createFakeDatabase();
-        /*
+        //createFakeDatabase();
+
 
         viewPager = findViewById(R.id.viewPager);
         ctl = findViewById(R.id.toolbar_layout);
@@ -88,19 +86,23 @@ public class ActivityScrolling extends AppCompatActivity
             }
         });
 
-        userForums = new ArrayList<>();
-        adapter = new AdapterSectionsPager(getSupportFragmentManager(), userForums);
-        viewPager.setAdapter(adapter);
-
         storageRef = FirebaseStorage.getInstance().getReference();
-        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail().replace(".", "%");
-        databaseRef = FirebaseDatabase.getInstance().getReference("userPicks/"+userEmail);
+        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseRef = FirebaseDatabase.getInstance().getReference("userForums/"+userID);
+
+        userForumIDs = new ArrayList<>();
+        userForumTitles = new ArrayList<>();
+
+        adapter = new AdapterSectionsPager(getSupportFragmentManager(), userForumIDs, userForumTitles);
+
+        viewPager.setAdapter(adapter);
 
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot child : snapshot.getChildren()) {
-                    userForums.add(child.getValue().toString());
+                    userForumIDs.add(child.getKey());
+                    userForumTitles.add(child.child("title").getValue(String.class));
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -133,7 +135,10 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
-        */
+
+
+
+
     }
 
     @Override
@@ -164,24 +169,13 @@ public class ActivityScrolling extends AppCompatActivity
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         DatabaseReference refUsers = database.getReference("users");
-        DatabaseReference refForums = database.getReference("forums");
-        DatabaseReference refTopics = database.getReference("topics");
-        DatabaseReference refMessages = database.getReference("messages");
-
         DatabaseReference refUserForums = database.getReference("userForums");
         DatabaseReference refForumTopics = database.getReference("forumTopics");
         DatabaseReference refTopicMessages = database.getReference("topicMessages");
 
-        refUsers.setValue(null);
-        refForums.setValue(null);
-        refTopics.setValue(null);
-        refMessages.setValue(null);
-
-        HashMap<String, Boolean> users = new HashMap<>();
-        users.put("7etZQqIhtyM3PcFwchWXkF57wq33", true);
-        users.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", true);
-        users.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
-        refUsers.setValue(users);
+        refUserForums.setValue(null);
+        refForumTopics.setValue(null);
+        refTopicMessages.setValue(null);
 
         HashMap<String, Boolean> userIDs = new HashMap<>();
         HashMap<String, Boolean> forumIDs = new HashMap<>();
@@ -191,53 +185,55 @@ public class ActivityScrolling extends AppCompatActivity
         userIDs.put("7etZQqIhtyM3PcFwchWXkF57wq33", true);
         userIDs.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", true);
         userIDs.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
+        refUsers.setValue(userIDs);
+
         forumIDs.put("-L2auVWUkz58XFqh5OsZ", true);
         forumIDs.put("-L2auVWVgH6_ocD3d99v", true);
         forumIDs.put("-L2auVWVgH6_ocD3d99y", true);
+
         topicIDs.put("-L2auVWVgH6_ocD3d99t", true);
         topicIDs.put("-L2auVWVgH6_ocD3d99w", true);
         topicIDs.put("-L2auVWVgH6_ocD3d99z", true);
+
         messageIDs.put("-L2auVWVgH6_ocD3d99u", true);
         messageIDs.put("-L2auVWVgH6_ocD3d99x", true);
         messageIDs.put("-L2auVWVgH6_ocD3d9A-", true);
 
-        refUsers.setValue(userIDs);
-        refForums.setValue(forumIDs);
-        refTopics.setValue(topicIDs);
-        refMessages.setValue(messageIDs);
-
-        HashMap<String, HashMap<String, Boolean>> userForums = new HashMap<>();
-        for(String userID : userIDs.keySet())
-            userForums.put(userID, forumIDs);
-        refUserForums.setValue(userForums);
-
-        HashMap<String, HashMap<String, Boolean>> forumTopics = new HashMap<>();
-        for(String forumID : forumIDs.keySet())
-            forumTopics.put(forumID, topicIDs);
-        refForumTopics.setValue(forumTopics);
-
-        HashMap<String, HashMap<String, Boolean>> topicMessages = new HashMap<>();
-        for(String topicID : topicIDs.keySet())
-            topicMessages.put(topicID, messageIDs);
-        refTopicMessages.setValue(topicMessages);
-
         Random rand = new Random();
 
-        for(String forumID : forumIDs.keySet()){
-            Forum forum = new Forum("Forum"+Integer.toString(rand.nextInt(10)));
-            refForums.child(forumID).setValue(forum);
+        //USER FORUMS
+        HashMap<String, HashMap<String, Forum>> userForums = new HashMap<>();
+        HashMap<String, Forum> forums = new HashMap<>();
+        for (String forumID : forumIDs.keySet()) {
+            Forum forum = new Forum("Forum" + Integer.toString(rand.nextInt(10)));
+            forums.put(forumID, forum);
         }
+        for(String userID : userIDs.keySet())
+            userForums.put(userID, forums);
+        refUserForums.setValue(userForums);
 
-        for(String topicID : topicIDs.keySet()){
-            Topic topic = new Topic("Topic"+Integer.toString(rand.nextInt(10)), "lastMessage");
-            refTopics.child(topicID).setValue(topic);
+
+        //FORUM TOPICS
+        HashMap<String, HashMap<String, Topic>> forumTopics = new HashMap<>();
+        HashMap<String, Topic> topics = new HashMap<>();
+        for (String topicID : topicIDs.keySet()) {
+            Topic topic = new Topic("Topic" + Integer.toString(rand.nextInt(10)), "WOW");
+            topics.put(topicID, topic);
         }
+        for(String forumID : forumIDs.keySet())
+            forumTopics.put(forumID, topics);
+        refForumTopics.setValue(forumTopics);
 
-        for(String messageID : messageIDs.keySet()){
-            Message message = new Message("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "Message"+Integer.toString(rand.nextInt(10)));
-            refMessages.child(messageID).setValue(message);
+        //TOPIC MESSAGES
+        HashMap<String, HashMap<String, Message>> topicMessages = new HashMap<>();
+        HashMap<String, Message> messages = new HashMap<>();
+        for (String messageID : messageIDs.keySet()) {
+            Message message = new Message("7etZQqIhtyM3PcFwchWXkF57wq33", "WOW");
+            messages.put(messageID, message);
         }
-
+        for(String topicID : topicIDs.keySet())
+            topicMessages.put(topicID, messages);
+        refTopicMessages.setValue(topicMessages);
 
 
     }

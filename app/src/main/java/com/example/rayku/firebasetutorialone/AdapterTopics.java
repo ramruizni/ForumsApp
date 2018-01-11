@@ -8,79 +8,81 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> {
 
-    private final List<String> items;
-    private final String forumTitle;
-    private final Context context;
+    private ArrayList<String> topicTitles, lastMessages;
+    private String forumID;
 
-    AdapterTopics(List<String> items, String forumTitle, Context context) {
-        this.items = items;
-        this.forumTitle = forumTitle;
-        this.context = context;
+    AdapterTopics(ArrayList<String> topicTitles, ArrayList<String> lastMessages,
+                  String forumID ) {
+        this.topicTitles = topicTitles;
+        this.lastMessages = lastMessages;
+        this.forumID = forumID;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic, parent, false);
 
+
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ActivityTopic.class);
-                intent.putExtra("forumTitle", forumTitle);
-
-                TextView titleView = view.findViewById(R.id.titleView);
-
-                intent.putExtra("topicTitle", titleView.getText());
-                view.getContext().startActivity(intent);
+                intent.putExtra("forumID", forumID);
             }
         });
 
-        return ViewHolder.newInstance(view, context);
+
+        return ViewHolder.newInstance(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String text = items.get(position);
-        holder.setText(text);
+        String title = topicTitles.get(position);
+        String lastMessage = lastMessages.get(position);
+        holder.setTitle(title);
+        holder.setLastMessage(lastMessage);
         holder.setRating();
         holder.setImage();
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return topicTitles.size();
     }
 
     public static final class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView titleView;
+        private final TextView lastMessageView;
         private final TextView ratingView;
         private final ImageView imageView;
 
-        Context context;
-
-        static ViewHolder newInstance(View itemView, Context context) {
-            TextView textView = itemView.findViewById(R.id.titleView);
+        static ViewHolder newInstance(View itemView) {
+            TextView titleView = itemView.findViewById(R.id.titleView);
+            TextView lastMessageView = itemView.findViewById(R.id.lastMessageView);
             TextView ratingView = itemView.findViewById(R.id.ratingView);
             ImageView imageView = itemView.findViewById(R.id.imageView);
-            return new ViewHolder(itemView, textView, ratingView, imageView, context);
+            return new ViewHolder(itemView, titleView, lastMessageView, ratingView, imageView);
         }
 
-        private ViewHolder(View itemView, TextView textView, TextView ratingView, ImageView imageView,
-                           Context context) {
+        private ViewHolder(View itemView, TextView titleView, TextView lastMessageView,
+                           TextView ratingView, ImageView imageView) {
             super(itemView);
-            this.textView = textView;
+            this.titleView = titleView;
+            this.lastMessageView = lastMessageView;
             this.ratingView = ratingView;
             this.imageView = imageView;
-            this.context = context;
         }
 
-        public void setText(CharSequence text) {
-            textView.setText(text);
+        public void setTitle(CharSequence text) {
+            titleView.setText(text);
         }
+        public void setLastMessage(CharSequence text){ lastMessageView.setText(text); }
 
         void setImage(){
 
