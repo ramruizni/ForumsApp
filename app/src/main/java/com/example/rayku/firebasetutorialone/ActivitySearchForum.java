@@ -1,10 +1,13 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,7 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ActivityAddForum extends AppCompatActivity {
+public class ActivitySearchForum extends AppCompatActivity implements View.OnClickListener{
 
     RecyclerView recyclerView;
     SearchView searchView;
@@ -22,6 +25,7 @@ public class ActivityAddForum extends AppCompatActivity {
     ArrayList<Forum> forums;
     ArrayList<String> forumIDs;
     FirebaseDatabase database;
+    FloatingActionButton newBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,8 @@ public class ActivityAddForum extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         searchView = findViewById(R.id.searchView);
+        newBtn = findViewById(R.id.newBtn);
+        newBtn.setOnClickListener(this);
 
         forums = new ArrayList<>();
         forumIDs = new ArrayList<>();
@@ -71,6 +77,12 @@ public class ActivityAddForum extends AppCompatActivity {
     }
 
 
-
-
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.newBtn:
+                Toast.makeText(this, "NEW FORUM", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
 }

@@ -1,25 +1,26 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.sip.SipAudioCall;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ContentFrameLayout;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.SearchView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -50,6 +50,10 @@ public class ActivityScrolling extends AppCompatActivity
     DatabaseReference databaseRef;
     StorageReference storageRef;
     FloatingActionButton leftBtn, midBtn, rightBtn;
+    SearchView searchView;
+    boolean searchViewVisible = false;
+    ViewGroup.MarginLayoutParams viewPagerLayoutParams;
+    private final int SEARCH_PUSH_MARGIN = 70;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +63,17 @@ public class ActivityScrolling extends AppCompatActivity
         createFakeDatabase();
 
         viewPager = findViewById(R.id.viewPager);
+        viewPagerLayoutParams = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
         ctl = findViewById(R.id.toolbar_layout);
         titleImageView = findViewById(R.id.imageView);
         leftBtn = findViewById(R.id.leftBtn);
         midBtn = findViewById(R.id.midBtn);
         rightBtn = findViewById(R.id.rightBtn);
         toolbar = findViewById(R.id.toolbar);
+        searchView = findViewById(R.id.searchView);
+        int magId = getResources().getIdentifier("android:id/search_mag_icon", null, null);
+        ImageView magImage = searchView.findViewById(magId);
+        magImage.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
 
         leftBtn.setOnClickListener(this);
         midBtn.setOnClickListener(this);
@@ -134,11 +143,23 @@ public class ActivityScrolling extends AppCompatActivity
 
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.my_menu, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(searchViewVisible){
+            viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
+            searchView.setVisibility(View.GONE);
+            searchViewVisible = false;
+        } else{
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -148,11 +169,29 @@ public class ActivityScrolling extends AppCompatActivity
                 startActivity(new Intent(getApplicationContext(), ActivityInfo.class));
                 break;
             case R.id.midBtn:
+                /*
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                */
+
+                if(searchViewVisible) {
+                    viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
+                    searchView.setVisibility(View.GONE);
+                    searchViewVisible = false;
+                }
+                else{
+                    searchView.setVisibility(View.VISIBLE);
+                    viewPagerLayoutParams.topMargin += SEARCH_PUSH_MARGIN;
+                    searchViewVisible = true;
+                    searchView.requestFocus();
+                    InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
+                    inputMethodManager.toggleSoftInputFromWindow(searchView.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+                }
+
+
                 break;
             case R.id.rightBtn:
-                startActivity(new Intent(getApplicationContext(), ActivityAddForum.class));
+                startActivity(new Intent(getApplicationContext(), ActivitySearchForum.class));
                 break;
         }
     }
