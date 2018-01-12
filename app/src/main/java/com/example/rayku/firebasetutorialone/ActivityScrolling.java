@@ -110,7 +110,7 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageSelected(int position) {
                 ctl.setTitle(adapter.getPageTitle(position));
-                String bgKey = "backgrounds/"+userForumIDs.get(position)+".jpg";
+                String bgKey = "forumImages/"+userForumIDs.get(position)+".jpg";
                 storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -183,10 +183,51 @@ public class ActivityScrolling extends AppCompatActivity
         forumIDs.put("-L2auVWUkz58XFqh5OsZ", true);
         forumIDs.put("-L2auVWVgH6_ocD3d99v", true);
         forumIDs.put("-L2auVWVgH6_ocD3d99y", true);
+        forumIDs.put("-L2dW61PVO-TIKUd-C8H", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzi", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzj", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzk", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzl", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzm", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzn", true);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzo", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrP", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrQ", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrR", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrS", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrT", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrU", true);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrV", true);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdF", true);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdG", true);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdH", true);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdI", true);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdJ", true);
 
         topicIDs.put("-L2auVWVgH6_ocD3d99t", true);
         topicIDs.put("-L2auVWVgH6_ocD3d99w", true);
         topicIDs.put("-L2auVWVgH6_ocD3d99z", true);
+        topicIDs.put("-L2dar4hnx0Lxbe-exQk", true);
+        topicIDs.put("-L2dar4iejJ_RcTpZkTP", true);
+        topicIDs.put("-L2dar4iejJ_RcTpZkTQ", true);
+        topicIDs.put("-L2dar4iejJ_RcTpZkTR", true);
+        topicIDs.put("-L2dar4iejJ_RcTpZkTS", true);
+        topicIDs.put("-L2dar4iejJ_RcTpZkTT", true);
+        topicIDs.put("-L2dar4j1mbP_JtriQHt", true);
+        topicIDs.put("-L2dar4j1mbP_JtriQHu", true);
+        topicIDs.put("-L2dar4j1mbP_JtriQHv", true);
+        topicIDs.put("-L2dar4j1mbP_JtriQHw", true);
+        topicIDs.put("-L2dar4j1mbP_JtriQHx", true);
+        topicIDs.put("-L2dar4kuNAICIosp7qG", true);
+        topicIDs.put("-L2dar4kuNAICIosp7qH", true);
+        topicIDs.put("-L2dar4kuNAICIosp7qI", true);
+        topicIDs.put("-L2dar4kuNAICIosp7qJ", true);
+        topicIDs.put("-L2dar4kuNAICIosp7qK", true);
+        topicIDs.put("-L2dar4lQF0wTdY7-5cW", true);
+        topicIDs.put("-L2dar4lQF0wTdY7-5cX", true);
+        topicIDs.put("-L2dar4lQF0wTdY7-5cY", true);
+        topicIDs.put("-L2dar4lQF0wTdY7-5cZ", true);
+
 
         messageIDs.put("-L2auVWVgH6_ocD3d99u", true);
         messageIDs.put("-L2auVWVgH6_ocD3d99x", true);
@@ -198,7 +239,7 @@ public class ActivityScrolling extends AppCompatActivity
         HashMap<String, HashMap<String, Forum>> userForums = new HashMap<>();
         HashMap<String, Forum> forums = new HashMap<>();
         for (String forumID : forumIDs.keySet()) {
-            Forum forum = new Forum("Forum" + Integer.toString(rand.nextInt(10)));
+            Forum forum = new Forum("Forum" + Integer.toString(rand.nextInt(100)));
             forums.put(forumID, forum);
         }
         for(String userID : userIDs.keySet())
@@ -209,7 +250,7 @@ public class ActivityScrolling extends AppCompatActivity
         HashMap<String, HashMap<String, Topic>> forumTopics = new HashMap<>();
         HashMap<String, Topic> topics = new HashMap<>();
         for (String topicID : topicIDs.keySet()) {
-            Topic topic = new Topic("Topic" + Integer.toString(rand.nextInt(10)),
+            Topic topic = new Topic("Topic" + Integer.toString(rand.nextInt(100)),
                     "WOW", rand.nextInt(10000), topicID);
             topics.put(topicID, topic);
         }
@@ -233,6 +274,19 @@ public class ActivityScrolling extends AppCompatActivity
         for(String topicID : topicIDs.keySet())
             topicMessages.put(topicID, messages);
         refTopicMessages.setValue(topicMessages);
+
+
+        DatabaseReference forumsRef = database.getReference("forums");
+        forumsRef.setValue(null);
+        HashMap<String, Forum> newForums = new HashMap<>();
+        for (int i = 0; i < 1000; i++) {
+            Forum newForum = new Forum("New Forum" + Integer.toString(rand.nextInt(1000)+100),
+                    "This is the space for an upcoming description of a group so what I am doing right now is filling" +
+                            "all of this with a bunch of text. Hopefully when somebody sees the demo template they will be able" +
+                            "to see this text inside a pretty nice box or something.");
+            newForums.put(forumsRef.push().getKey(), newForum);
+        }
+        forumsRef.setValue(newForums);
 
 
     }

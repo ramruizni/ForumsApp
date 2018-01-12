@@ -2,26 +2,31 @@ package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
 public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> {
 
     private ArrayList<Topic> topics;
-
     private String forumID;
     private Context context;
+    private StorageReference storageReference;
 
     AdapterTopics(ArrayList<Topic> topics, String forumID, Context context) {
         this.topics = topics;
         this.forumID = forumID;
         this.context = context;
+        this.storageReference = FirebaseStorage.getInstance().getReference().child("topicImages");
     }
 
     @Override
@@ -62,7 +67,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         holder.setRating(rating);
         holder.cheatTheSystem(phantomCheat);
 
-        holder.setImage();
+        holder.setImage(phantomCheat, storageReference);
 
     }
 
@@ -97,26 +102,34 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             this.phantomCheatView = phantomCheatView;
         }
 
-        public void setTitle(CharSequence text) {
+        public void setTitle(String text) {
             titleView.setText(text);
         }
-        public void setLastMessage(CharSequence text){ lastMessageView.setText(text); }
+        public void setLastMessage(String text){ lastMessageView.setText(text); }
 
-        void setImage(){
+        void setImage(String topicID, StorageReference storageReference){
 
-            String url = "https://firebasestorage.googleapis.com/v0/b/fir-tutorialone-157a7.appspot.com/o/profileImages%2Fprofile1.jpg?alt=media&token=74e37d47-2493-4723-becb-e823f50d18c2";
-            GlideApp
-                    .with(itemView.getRootView().getContext())
-                    .load(url)
-                    .centerCrop()
-                    .placeholder(R.drawable.common_google_signin_btn_icon_light_normal_background)
-                    .into(imageView);
+            String imageKey = topicID+".jpg";
+            storageReference.child(imageKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    try {
+                        GlideApp
+                                .with(itemView.getRootView().getContext())
+                                .load(uri)
+                                .fitCenter()
+                                .into(imageView);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
 
         }
-
         void setRating(int rating) {
             ratingView.setText(Integer.toString(rating));
         }
+
         void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
 
     }
