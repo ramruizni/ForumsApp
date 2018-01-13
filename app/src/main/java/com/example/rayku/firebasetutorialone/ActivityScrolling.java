@@ -2,14 +2,12 @@ package com.example.rayku.firebasetutorialone;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.net.sip.SipAudioCall;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ContentFrameLayout;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +17,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SearchView;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -53,14 +47,15 @@ public class ActivityScrolling extends AppCompatActivity
     SearchView searchView;
     boolean searchViewVisible = false;
     ViewGroup.MarginLayoutParams viewPagerLayoutParams;
-    private final int SEARCH_PUSH_MARGIN = 70;
+    private final int SEARCH_PUSH_MARGIN = 80;
+    String currForumID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
 
-        createFakeDatabase();
+        //createFakeDatabase();
 
         viewPager = findViewById(R.id.viewPager);
         viewPagerLayoutParams = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
@@ -71,9 +66,6 @@ public class ActivityScrolling extends AppCompatActivity
         rightBtn = findViewById(R.id.rightBtn);
         toolbar = findViewById(R.id.toolbar);
         searchView = findViewById(R.id.searchView);
-        int magId = getResources().getIdentifier("android:id/search_mag_icon", null, null);
-        ImageView magImage = searchView.findViewById(magId);
-        magImage.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
 
         leftBtn.setOnClickListener(this);
         midBtn.setOnClickListener(this);
@@ -118,6 +110,7 @@ public class ActivityScrolling extends AppCompatActivity
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                currForumID = userForumIDs.get(position);
                 ctl.setTitle(adapter.getPageTitle(position));
                 String bgKey = "forumImages/"+userForumIDs.get(position)+".jpg";
                 storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -162,18 +155,17 @@ public class ActivityScrolling extends AppCompatActivity
         }
     }
 
+    public SearchView getSearchView(){ return searchView; }
+
     @Override
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.leftBtn:
-                startActivity(new Intent(getApplicationContext(), ActivityInfo.class));
+                Intent intent = new Intent(this, ActivityInfo.class);
+                intent.putExtra("forumID", currForumID);
+                startActivity(intent);
                 break;
             case R.id.midBtn:
-                /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                */
-
                 if(searchViewVisible) {
                     viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
                     searchView.setVisibility(View.GONE);
@@ -184,11 +176,11 @@ public class ActivityScrolling extends AppCompatActivity
                     viewPagerLayoutParams.topMargin += SEARCH_PUSH_MARGIN;
                     searchViewVisible = true;
                     searchView.requestFocus();
-                    InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
+
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    assert inputMethodManager != null;
                     inputMethodManager.toggleSoftInputFromWindow(searchView.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
                 }
-
-
                 break;
             case R.id.rightBtn:
                 startActivity(new Intent(getApplicationContext(), ActivitySearchForum.class));
@@ -210,7 +202,7 @@ public class ActivityScrolling extends AppCompatActivity
         refTopicMessages.setValue(null);
 
         HashMap<String, Boolean> userIDs = new HashMap<>();
-        HashMap<String, Boolean> forumIDs = new HashMap<>();
+        HashMap<String, Integer> forumIDs = new HashMap<>();
         HashMap<String, Boolean> topicIDs = new HashMap<>();
         HashMap<String, Boolean> messageIDs = new HashMap<>();
 
@@ -219,29 +211,29 @@ public class ActivityScrolling extends AppCompatActivity
         userIDs.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
         refUsers.setValue(userIDs);
 
-        forumIDs.put("-L2auVWUkz58XFqh5OsZ", true);
-        forumIDs.put("-L2auVWVgH6_ocD3d99v", true);
-        forumIDs.put("-L2auVWVgH6_ocD3d99y", true);
-        forumIDs.put("-L2dW61PVO-TIKUd-C8H", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzi", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzj", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzk", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzl", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzm", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzn", true);
-        forumIDs.put("-L2dW61R5oR7K4ATKfzo", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrP", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrQ", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrR", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrS", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrT", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrU", true);
-        forumIDs.put("-L2dW61SdpyP-qhsfyrV", true);
-        forumIDs.put("-L2dW61TcbYvjWIv3wdF", true);
-        forumIDs.put("-L2dW61TcbYvjWIv3wdG", true);
-        forumIDs.put("-L2dW61TcbYvjWIv3wdH", true);
-        forumIDs.put("-L2dW61TcbYvjWIv3wdI", true);
-        forumIDs.put("-L2dW61TcbYvjWIv3wdJ", true);
+        forumIDs.put("-L2auVWUkz58XFqh5OsZ", 1);
+        forumIDs.put("-L2auVWVgH6_ocD3d99v", 2);
+        forumIDs.put("-L2auVWVgH6_ocD3d99y", 3);
+        forumIDs.put("-L2dW61PVO-TIKUd-C8H", 4);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzi", 5);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzj", 6);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzk", 7);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzl", 8);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzm", 9);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzn", 10);
+        forumIDs.put("-L2dW61R5oR7K4ATKfzo", 11);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrP", 12);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrQ", 13);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrR", 14);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrS", 15);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrT", 16);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrU", 17);
+        forumIDs.put("-L2dW61SdpyP-qhsfyrV", 18);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdF", 19);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdG", 20);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdH", 21);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdI", 22);
+        forumIDs.put("-L2dW61TcbYvjWIv3wdJ", 23);
 
         topicIDs.put("-L2auVWVgH6_ocD3d99t", true);
         topicIDs.put("-L2auVWVgH6_ocD3d99w", true);
@@ -267,7 +259,6 @@ public class ActivityScrolling extends AppCompatActivity
         topicIDs.put("-L2dar4lQF0wTdY7-5cY", true);
         topicIDs.put("-L2dar4lQF0wTdY7-5cZ", true);
 
-
         messageIDs.put("-L2auVWVgH6_ocD3d99u", true);
         messageIDs.put("-L2auVWVgH6_ocD3d99x", true);
         messageIDs.put("-L2auVWVgH6_ocD3d9A-", true);
@@ -278,7 +269,7 @@ public class ActivityScrolling extends AppCompatActivity
         HashMap<String, HashMap<String, Forum>> userForums = new HashMap<>();
         HashMap<String, Forum> forums = new HashMap<>();
         for (String forumID : forumIDs.keySet()) {
-            Forum forum = new Forum("Forum" + Integer.toString(rand.nextInt(100)));
+            Forum forum = new Forum("Forum" + Integer.toString(forumIDs.get(forumID)));
             forums.put(forumID, forum);
         }
         for(String userID : userIDs.keySet())
@@ -326,6 +317,14 @@ public class ActivityScrolling extends AppCompatActivity
             newForums.put(forumsRef.push().getKey(), newForum);
         }
         forumsRef.setValue(newForums);
+
+        for(String forumID : forumIDs.keySet()){ // to sync with the user ones
+            Forum newForum = new Forum("Forum" + Integer.toString(forumIDs.get(forumID)),
+                    "This is the space for an upcoming description of a group so what I am doing right now is filling " +
+                            "all of this with a bunch of text. Hopefully when somebody sees the demo template they will be able " +
+                            "to see this text inside a pretty nice box or something.");
+            forumsRef.child(forumID).setValue(newForum);
+        }
 
 
     }

@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -15,9 +17,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> {
+public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> implements Filterable {
 
-    private ArrayList<Topic> topics;
+    private ArrayList<Topic> topics, filteredData;
     private String forumID;
     private Context context;
     private StorageReference storageReference;
@@ -27,6 +29,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         this.forumID = forumID;
         this.context = context;
         this.storageReference = FirebaseStorage.getInstance().getReference().child("topicImages");
+        filteredData = topics;
     }
 
     @Override
@@ -57,10 +60,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String title = topics.get(position).title;
-        String lastMessage = topics.get(position).lastMessage;
-        int rating = topics.get(position).rating;
-        String phantomCheat = topics.get(position).ID;
+        String title = filteredData.get(position).title;
+        String lastMessage = filteredData.get(position).lastMessage;
+        int rating = filteredData.get(position).rating;
+        String phantomCheat = filteredData.get(position).ID;
 
         holder.setTitle(title);
         holder.setLastMessage(lastMessage);
@@ -73,7 +76,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
     @Override
     public int getItemCount() {
-        return topics.size();
+        return filteredData.size();
     }
 
     public static final class ViewHolder extends RecyclerView.ViewHolder {
@@ -129,9 +132,42 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         void setRating(int rating) {
             ratingView.setText(Integer.toString(rating));
         }
-
         void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
 
+    }
+
+
+    @Override
+    public Filter getFilter() {
+
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+
+                FilterResults filterResults = new FilterResults();
+
+                if(charSequence==null || charSequence.length()==0){
+                    filterResults.values = topics;
+                    filterResults.count = topics.size();
+                } else{
+                    ArrayList<Topic> filterResultsData = new ArrayList<>();
+                    for(Topic topic : topics){
+                        if(topic.title.toLowerCase().contains(charSequence.toString().toLowerCase())){
+                            filterResultsData.add(topic);
+                        }
+                    }
+                    filterResults.values = filterResultsData;
+                    filterResults.count = filterResultsData.size();
+                }
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                filteredData = (ArrayList<Topic>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
 }

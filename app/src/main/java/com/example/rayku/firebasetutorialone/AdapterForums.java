@@ -37,9 +37,11 @@ public final class AdapterForums extends RecyclerView.Adapter<AdapterForums.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         String title = filteredData.get(position).title;
         String description = filteredData.get(position).description;
+
         holder.setTitle(title);
         holder.setDescription(description);
-        holder.setImage(forumIDs.get(position), storageReference);
+
+        holder.setImage(forumIDs.get(position), storageReference); // maybe this is an issue. forumIDs? what about filteredData?
     }
 
     @Override
