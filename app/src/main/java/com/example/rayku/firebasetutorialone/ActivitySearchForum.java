@@ -1,13 +1,14 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,16 +27,22 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
     ArrayList<String> forumIDs;
     FirebaseDatabase database;
     FloatingActionButton newBtn;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_forum);
+        setContentView(R.layout.activity_search_forum);
 
         recyclerView = findViewById(R.id.recyclerView);
         searchView = findViewById(R.id.searchView);
         newBtn = findViewById(R.id.newBtn);
         newBtn.setOnClickListener(this);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         forums = new ArrayList<>();
         forumIDs = new ArrayList<>();
@@ -81,7 +88,7 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.newBtn:
-                Toast.makeText(this, "NEW FORUM", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ActivityNewForum.class));
                 break;
         }
     }

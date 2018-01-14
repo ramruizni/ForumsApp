@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -49,6 +51,7 @@ public class ActivityScrolling extends AppCompatActivity
     ViewGroup.MarginLayoutParams viewPagerLayoutParams;
     private final int SEARCH_PUSH_MARGIN = 80;
     String currForumID;
+    TextView noForumsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class ActivityScrolling extends AppCompatActivity
         rightBtn = findViewById(R.id.rightBtn);
         toolbar = findViewById(R.id.toolbar);
         searchView = findViewById(R.id.searchView);
+        noForumsView = findViewById(R.id.noForumsView);
 
         leftBtn.setOnClickListener(this);
         midBtn.setOnClickListener(this);
@@ -138,7 +142,6 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
-
     }
 
 

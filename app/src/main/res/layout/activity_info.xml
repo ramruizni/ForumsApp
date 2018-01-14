@@ -6,14 +6,24 @@
     android:layout_height="match_parent"
     tools:context="com.example.rayku.firebasetutorialone.ActivityInfo">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@android:style/Theme.Holo"
+        app:title="Forum Info" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_alignParentTop="true"
+        android:layout_height="200dp"
+        android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp"
-        android:src="@drawable/forum_bg"/>
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/the_forum_bg" />
 
     <TextView
         android:id="@+id/titleView"
@@ -23,7 +33,6 @@
         android:layout_below="@+id/imageView"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
         android:textSize="30sp" />
 
     <TextView
@@ -35,5 +44,5 @@
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        android:textSize="20sp" />
+        android:textSize="14sp" />
 </RelativeLayout>

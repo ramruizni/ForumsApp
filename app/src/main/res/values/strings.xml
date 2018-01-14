@@ -7,4 +7,6 @@
     <string name="tochats">toChats</string>
     <string name="type_a_message">Type a message</string>
     <string name="log_out">Log Out</string>
+    <string name="add_forums">To add some forums\nto your list press the\n+ icon on the top.</string>
+    <string name="add_topics">To add some talks to\nthis forum press the\n+ sign on the bottom.</string>
 </resources>

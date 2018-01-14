@@ -3,6 +3,7 @@ package com.example.rayku.firebasetutorialone;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ public class ActivityInfo extends AppCompatActivity {
     String forumID, forumTitle, description;
     ImageView imageView;
     TextView titleView, descView;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,12 @@ public class ActivityInfo extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         titleView = findViewById(R.id.titleView);
         descView = findViewById(R.id.descView);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         forumID = getIntent().getExtras().getString("forumID");
 
