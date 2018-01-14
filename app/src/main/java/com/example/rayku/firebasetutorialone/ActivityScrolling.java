@@ -79,6 +79,11 @@ public class ActivityScrolling extends AppCompatActivity
                     case R.id.action_settings:
                         startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
                         break;
+                    case R.id.action_log_out:
+                        FirebaseAuth.getInstance().signOut();
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
+                        break;
                 }
                 return false;
             }

@@ -41,7 +41,6 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
             case(R.id.signUpBtn):
                 registerUser();
                 break;
-
             case(R.id.toLogIn):
                 finish();
                 startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
@@ -53,8 +52,8 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
 
         progressBar.setVisibility(View.VISIBLE);
 
-        String email = signEmail.getText().toString().trim();
-        String password = signPwd.getText().toString().trim();
+        String email = signEmail.getText().toString();
+        String password = signPwd.getText().toString();
 
         if(email.isEmpty()){
             signEmail.setError("Email is required");
@@ -87,7 +86,7 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
                         progressBar.setVisibility(View.GONE);
                         if(task.isSuccessful()) {
                             finish();
-                            startActivity(new Intent(ActivitySignup.this, ActivityProfile.class));
+                            startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
                         }else{
                             if(task.getException() instanceof FirebaseAuthUserCollisionException)
                                 Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();

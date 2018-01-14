@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -19,7 +18,16 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
 
     private FirebaseAuth mAuth;
     private EditText logEmail, logPwd;
-    private ProgressBar progressBar2;
+    private ProgressBar progressBar;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mAuth.getCurrentUser()!=null){
+            finish();
+            startActivity(new Intent(this, ActivityScrolling.class));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,53 +36,55 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
 
         logEmail = findViewById(R.id.logEmail);
         logPwd = findViewById(R.id.logPwd);
-        progressBar2 = findViewById(R.id.progressBar2);
+        progressBar = findViewById(R.id.progressBar);
         findViewById(R.id.toSignUp).setOnClickListener(this);
         findViewById(R.id.loginBtn).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
-
-        //createDataBase();
     }
 
     private void userLogin(){
 
-        progressBar2.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
-        String email = logEmail.getText().toString().trim();
-        String password = logPwd.getText().toString().trim();
+        String email = logEmail.getText().toString();
+        String password = logPwd.getText().toString();
 
         if(email.isEmpty()){
             logEmail.setError("Email is required");
             logEmail.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             logEmail.setError("Enter a valid email");
             logEmail.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
 
         if(password.isEmpty()){
             logPwd.setError("Password is required");
             logPwd.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
 
         if(password.length()<6){
             logPwd.setError("Minimum length of password should be 6");
             logPwd.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
 
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                progressBar2.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                     finish();
-                    startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
+                    startActivity(new Intent(getApplicationContext(), ActivityScrolling.class));
                 } else{
                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -84,22 +94,12 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if(mAuth.getCurrentUser()!=null){
-            finish();
-            startActivity(new Intent(getApplicationContext(), ActivityScrolling.class));
-        }
-    }
-
-    @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.toSignUp:
                 finish();
                 startActivity(new Intent(getApplicationContext(), ActivitySignup.class));
                 break;
-
             case(R.id.loginBtn):
                 userLogin();
                 break;

@@ -73,6 +73,6 @@
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/ratingView"
-        app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
+        app:srcCompat="@drawable/topic_bg" />
 
 </RelativeLayout>

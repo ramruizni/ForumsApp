@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.rayku.firebasetutorialone.ActivityProfile">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@android:style/Theme.Holo"
+        app:title="Settings" />
+
     <ImageView
         android:id="@+id/profileImage"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
-        android:contentDescription="@string/description"/>
+        android:layout_marginTop="20dp"
+        android:contentDescription="@string/description" />
 
     <EditText
         android:id="@+id/displayName"
-        android:layout_width="320dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profileImage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="17dp"
-        android:hint="@string/enter_display_name" />
+        android:layout_centerHorizontal="false"
+        android:layout_marginTop="20dp"
+        android:hint="@string/enter_display_name"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:background="@android:color/transparent"/>
 
     <Button
         android:id="@+id/saveBtn"
@@ -30,10 +43,12 @@
         android:layout_below="@+id/displayName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
-        android:text="@string/save" />
+        android:text="@string/save"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"/>
 
     <ProgressBar
-        android:id="@+id/progressBar3"
+        android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,12 +56,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="73dp" />
 
-    <Button
-        android:id="@+id/toChatsBtn"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/camBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/saveBtn"
-        android:layout_below="@+id/saveBtn"
-        android:text="@string/tochats" />
+        android:layout_above="@+id/displayName"
+        android:layout_alignEnd="@+id/profileImage"
+        android:layout_marginBottom="-5dp"
+        android:layout_marginEnd="-5dp"
+        android:clickable="true"
+        app:srcCompat="@drawable/cam" />
 
 </RelativeLayout>

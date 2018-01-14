@@ -6,4 +6,5 @@
     <string name="save">Save</string>
     <string name="tochats">toChats</string>
     <string name="type_a_message">Type a message</string>
+    <string name="log_out">Log Out</string>
 </resources>
