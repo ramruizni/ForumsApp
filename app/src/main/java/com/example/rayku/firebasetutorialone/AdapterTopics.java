@@ -3,7 +3,9 @@ package com.example.rayku.firebasetutorialone;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +13,26 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> implements Filterable {
 
-    private ArrayList<Topic> topics, filteredData;
+    private HashMap<String, Topic> topics, filteredData;
+    private ArrayList<String> topicIDs;
     private String forumID;
     private Context context;
     private StorageReference storageReference;
 
-    AdapterTopics(ArrayList<Topic> topics, String forumID, Context context) {
+    AdapterTopics(HashMap<String, Topic> topics, ArrayList<String> topicIDs, String forumID, Context context) {
         this.topics = topics;
+        this.topicIDs = topicIDs;
         this.forumID = forumID;
         this.context = context;
         this.storageReference = FirebaseStorage.getInstance().getReference().child("topicImages");
@@ -60,10 +67,14 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String title = filteredData.get(position).title;
-        String lastMessage = filteredData.get(position).lastMessage;
-        int rating = filteredData.get(position).rating;
-        String phantomCheat = filteredData.get(position).ID;
+
+        String ID = topicIDs.get(position);
+        Log.i("WTH", ID);
+
+        String title = filteredData.get(ID).title;
+        String lastMessage = filteredData.get(ID).lastMessage;
+        int rating = filteredData.get(ID).rating;
+        String phantomCheat = filteredData.get(ID).ID;
 
         holder.setTitle(title);
         holder.setLastMessage(lastMessage);
@@ -109,22 +120,27 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             titleView.setText(text);
         }
         public void setLastMessage(String text){ lastMessageView.setText(text); }
-
         void setImage(String topicID, StorageReference storageReference){
-
             String imageKey = topicID+".jpg";
             storageReference.child(imageKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     try {
-                        GlideApp
-                                .with(itemView.getRootView().getContext())
+                        GlideApp.with(itemView.getRootView().getContext())
                                 .load(uri)
                                 .fitCenter()
                                 .into(imageView);
                     } catch(Exception e){
                         e.printStackTrace();
                     }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    GlideApp.with(itemView.getRootView().getContext())
+                            .load(R.drawable.topic_bg)
+                            .fitCenter()
+                            .into(imageView);
                 }
             });
 
@@ -135,7 +151,6 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
 
     }
-
 
     @Override
     public Filter getFilter() {
@@ -150,10 +165,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
                     filterResults.values = topics;
                     filterResults.count = topics.size();
                 } else{
-                    ArrayList<Topic> filterResultsData = new ArrayList<>();
-                    for(Topic topic : topics){
-                        if(topic.title.toLowerCase().contains(charSequence.toString().toLowerCase())){
-                            filterResultsData.add(topic);
+                    HashMap<String, Topic> filterResultsData = new HashMap<>();
+                    for(String key : topics.keySet()){
+                        if(topics.get(key).title.toLowerCase().contains(charSequence.toString().toLowerCase())){
+                            filterResultsData.put(key, topics.get(key));
                         }
                     }
                     filterResults.values = filterResultsData;
@@ -164,7 +179,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                filteredData = (ArrayList<Topic>) filterResults.values;
+                filteredData = (HashMap<String, Topic>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

@@ -21,8 +21,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
 public class ActivityTopic extends AppCompatActivity implements View.OnClickListener{
@@ -59,21 +57,9 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         topicTitle = extras.get("topicTitle").toString();
 
         toolbar.setTitle(topicTitle);
-
         setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.action_settings:
-                        Intent intent = new Intent(getApplicationContext(), ActivityTopicSettings.class);
-                        intent.putExtra("topicTitle", topicTitle);
-                        startActivity(intent);
-                        break;
-                }
-                return false;
-            }
-        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -89,16 +75,21 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         ref = database.getReference("topicMessages/"+topicID);
         lastMessageRef = database.getReference("forumTopics/"+forumID+"/"+topicID);
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    String sender = child.child("sender").getValue(String.class);
-                    String content = child.child("content").getValue(String.class);
-                    messages.add(new Message(sender, content));
-                    adapter.notifyDataSetChanged();
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String sender = dataSnapshot.child("sender").getValue(String.class);
+                String content = dataSnapshot.child("content").getValue(String.class);
+                messages.add(new Message(sender, content));
+                adapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
@@ -111,11 +102,7 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
 
         Message newMessage = new Message(currentUser, input);
         ref.push().setValue(newMessage);
-        messages.add(newMessage);
-        adapter.notifyDataSetChanged();
-
         lastMessageRef.child("lastMessage").setValue(input);
-
 
         View view = this.getCurrentFocus();
         if (view != null) {
@@ -125,7 +112,6 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
 
         recyclerView.scrollToPosition(messages.size()-1);
         editText.setText(null);
-
     }
 
     @Override
@@ -149,5 +135,11 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
                 sendMessage();
                 break;
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

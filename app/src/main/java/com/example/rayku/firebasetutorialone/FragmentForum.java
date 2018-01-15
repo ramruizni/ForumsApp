@@ -10,19 +10,20 @@ import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FragmentForum extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    ArrayList<Topic> topics;
-
+    HashMap<String, Topic> topics;
+    ArrayList<String> topicIDs;
     View rootView;
     RecyclerView recyclerView;
     AdapterTopics adapter;
@@ -36,25 +37,40 @@ public class FragmentForum extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        topics = new ArrayList<>();
+        topics = new HashMap<>();
+        topicIDs = new ArrayList<>();
 
         arguments = getArguments();
         forumID = arguments.getString("forumID");
 
-        adapter = new AdapterTopics(topics, forumID, getActivity());
+        adapter = new AdapterTopics(topics, topicIDs, forumID, getActivity());
 
-        Query ref = FirebaseDatabase.getInstance().getReference("forumTopics/"+forumID).orderByChild("rating");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("forumTopics/"+forumID);
+        ref.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    String title = child.child("title").getValue(String.class);
-                    String lastMessage = child.child("lastMessage").getValue(String.class);
-                    Integer rating = child.child("rating").getValue(Integer.class);
-                    topics.add(new Topic(title, lastMessage, rating, child.getKey()));
-                    adapter.notifyDataSetChanged();
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String title = dataSnapshot.child("title").getValue(String.class);
+                String lastMessage = dataSnapshot.child("lastMessage").getValue(String.class);
+                Integer rating = dataSnapshot.child("rating").getValue(Integer.class);
+                topics.put(dataSnapshot.getKey(), new Topic(title, lastMessage, rating, dataSnapshot.getKey()));
+                topicIDs.add(dataSnapshot.getKey());
+                adapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                String title = dataSnapshot.child("title").getValue(String.class);
+                String lastMessage = dataSnapshot.child("lastMessage").getValue(String.class);
+                Integer rating = dataSnapshot.child("rating").getValue(Integer.class);
+                topics.put(dataSnapshot.getKey(), new Topic(title, lastMessage, rating, dataSnapshot.getKey()));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });

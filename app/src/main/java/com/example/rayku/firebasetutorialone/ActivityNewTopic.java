@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,69 +18,84 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class ActivityNewForum extends AppCompatActivity implements View.OnClickListener{
+public class ActivityNewTopic extends AppCompatActivity implements View.OnClickListener{
 
     ImageView imageView;
-    TextView titleView, descView;
-    Toolbar toolbar;
-    private Uri uriForumImage;
-    Button createBtn;
+    EditText titleView, firstMessageView;
     FloatingActionButton camBtn;
-
+    Button createBtn;
+    Toolbar toolbar;
+    Uri uriTopicImage;
+    String forumID;
     private static final int CHOOSE_IMAGE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_forum);
-
+        setContentView(R.layout.activity_new_topic);
         imageView = findViewById(R.id.imageView);
         titleView = findViewById(R.id.titleView);
-        descView = findViewById(R.id.descView);
-        createBtn = findViewById(R.id.createBtn);
+        firstMessageView = findViewById(R.id.firstMessageView);
         camBtn = findViewById(R.id.camBtn);
-        toolbar = findViewById(R.id.toolbar);
-
-        createBtn.setOnClickListener(this);
+        createBtn = findViewById(R.id.createBtn);
         camBtn.setOnClickListener(this);
+        createBtn.setOnClickListener(this);
 
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        GlideApp.with(this)
-                .load(R.drawable.the_forum_bg)
-                .centerCrop()
-                .into(imageView);
+        forumID = getIntent().getExtras().getString("forumID");
+
     }
 
-    public void createForum(){
+    private void createTopic() {
         String title = titleView.getText().toString();
-        String desc = descView.getText().toString();
+        String firstMessage = firstMessageView.getText().toString();
         if(title.isEmpty()){
-            titleView.setError("Title required");
+            titleView.setError("Name required");
             titleView.requestFocus();
             return;
         }
-        if(desc.isEmpty()){
-            descView.setError("Description required");
-            descView.requestFocus();
+        if(firstMessage.isEmpty()){
+            firstMessageView.setError("First message required");
+            firstMessageView.requestFocus();
             return;
         }
 
+
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-        String forumID = dbRef.child("forums").push().getKey();
-        Forum newForum = new Forum(title, desc);
-        dbRef.child("forums/"+forumID).setValue(newForum);
-        String userID = FirebaseAuth.getInstance().getUid();
-        dbRef.child("userForums/"+userID+"/"+forumID).setValue(new Forum(title));
+        String topicID = dbRef.child("forumTopics/"+forumID).push().getKey();
+        Topic newTopic = new Topic(title, firstMessage, 0, topicID);
+        dbRef.child("forumTopics/"+forumID+"/"+topicID).setValue(newTopic);
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("forumImages/"+forumID+".jpg");
-        if(uriForumImage!=null) storageRef.putFile(uriForumImage);
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("topicImages/"+topicID+".jpg");
+        if(uriTopicImage!=null) storageRef.putFile(uriTopicImage);
 
-        Toast.makeText(this, "Forum creation successful!", Toast.LENGTH_SHORT).show();
+        String firstMessageID = dbRef.child("topicMessages/"+topicID).push().getKey();
+
+        Message newMessage = new Message(FirebaseAuth.getInstance().getUid(), firstMessage);
+        dbRef.child("topicMessages/"+topicID+"/"+firstMessageID).setValue(newMessage);
+
+        Toast.makeText(this, "Topic creation successful!", Toast.LENGTH_SHORT).show();
         finish();
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            uriTopicImage = data.getData();
+            try{
+                GlideApp.with(this)
+                        .load(uriTopicImage)
+                        .centerCrop()
+                        .into(imageView);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     private void showImageChooser(){
@@ -91,36 +106,15 @@ public class ActivityNewForum extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            uriForumImage = data.getData();
-            try{
-                GlideApp.with(this)
-                        .load(uriForumImage)
-                        .centerCrop()
-                        .into(imageView);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
     public void onClick(View view) {
         switch(view.getId()){
-            case R.id.createBtn:
-                createForum();
-                break;
             case R.id.camBtn:
                 showImageChooser();
                 break;
+            case R.id.createBtn:
+                createTopic();
+                break;
         }
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
 }

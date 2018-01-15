@@ -24,7 +24,6 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
     SearchView searchView;
     AdapterForums adapter;
     ArrayList<Forum> forums;
-    ArrayList<String> forumIDs;
     FirebaseDatabase database;
     FloatingActionButton newBtn;
     Toolbar toolbar;
@@ -45,9 +44,8 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         forums = new ArrayList<>();
-        forumIDs = new ArrayList<>();
 
-        adapter = new AdapterForums(forums, forumIDs);
+        adapter = new AdapterForums(forums);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
@@ -59,8 +57,7 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     String title = child.child("title").getValue(String.class);
                     String description = child.child("description").getValue(String.class);
-                    forums.add(new Forum(title, description));
-                    forumIDs.add(child.getKey());
+                    forums.add(new Forum(child.getKey(), title, description));
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -79,8 +76,6 @@ public class ActivitySearchForum extends AppCompatActivity implements View.OnCli
             }
 
         });
-
-
     }
 
 

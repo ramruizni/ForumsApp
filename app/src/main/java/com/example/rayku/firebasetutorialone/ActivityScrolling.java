@@ -17,15 +17,14 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
@@ -43,15 +42,15 @@ public class ActivityScrolling extends AppCompatActivity
     ViewPager viewPager;
     AdapterSectionsPager adapter;
     ArrayList<String> userForumIDs, userForumTitles;
-    DatabaseReference databaseRef;
+    DatabaseReference userForumsRef;
     StorageReference storageRef;
-    FloatingActionButton leftBtn, midBtn, rightBtn;
+    FloatingActionButton leftBtn, midBtn, rightBtn, newTopicBtn;
     SearchView searchView;
     boolean searchViewVisible = false;
     ViewGroup.MarginLayoutParams viewPagerLayoutParams;
     private final int SEARCH_PUSH_MARGIN = 80;
+
     String currForumID;
-    TextView noForumsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +66,14 @@ public class ActivityScrolling extends AppCompatActivity
         leftBtn = findViewById(R.id.leftBtn);
         midBtn = findViewById(R.id.midBtn);
         rightBtn = findViewById(R.id.rightBtn);
+        newTopicBtn = findViewById(R.id.newTopicBtn);
         toolbar = findViewById(R.id.toolbar);
         searchView = findViewById(R.id.searchView);
-        noForumsView = findViewById(R.id.noForumsView);
 
         leftBtn.setOnClickListener(this);
         midBtn.setOnClickListener(this);
         rightBtn.setOnClickListener(this);
+        newTopicBtn.setOnClickListener(this);
 
         setSupportActionBar(toolbar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -95,7 +95,7 @@ public class ActivityScrolling extends AppCompatActivity
 
         storageRef = FirebaseStorage.getInstance().getReference();
         String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        databaseRef = FirebaseDatabase.getInstance().getReference("userForums/"+userID);
+        userForumsRef = FirebaseDatabase.getInstance().getReference("userForums/"+userID);
 
         userForumIDs = new ArrayList<>();
         userForumTitles = new ArrayList<>();
@@ -103,15 +103,28 @@ public class ActivityScrolling extends AppCompatActivity
         adapter = new AdapterSectionsPager(getSupportFragmentManager(), userForumIDs, userForumTitles);
         viewPager.setAdapter(adapter);
 
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userForumsRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    userForumIDs.add(child.getKey());
-                    userForumTitles.add(child.child("title").getValue(String.class));
-                    adapter.notifyDataSetChanged();
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                userForumIDs.add(dataSnapshot.getKey());
+                userForumTitles.add(dataSnapshot.child("title").getValue(String.class));
+                adapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                userForumIDs.remove(dataSnapshot.getKey());
+                userForumTitles.remove(dataSnapshot.child("title").getValue(String.class));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
@@ -152,17 +165,6 @@ public class ActivityScrolling extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        if(searchViewVisible){
-            viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
-            searchView.setVisibility(View.GONE);
-            searchViewVisible = false;
-        } else{
-            super.onBackPressed();
-        }
-    }
-
     public SearchView getSearchView(){ return searchView; }
 
     @Override
@@ -193,6 +195,22 @@ public class ActivityScrolling extends AppCompatActivity
             case R.id.rightBtn:
                 startActivity(new Intent(getApplicationContext(), ActivitySearchForum.class));
                 break;
+            case R.id.newTopicBtn:
+                Intent anIntent = new Intent(this, ActivityNewTopic.class);
+                anIntent.putExtra("forumID", currForumID);
+                startActivity(anIntent);
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(searchViewVisible){
+            viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
+            searchView.setVisibility(View.GONE);
+            searchViewVisible = false;
+        } else{
+            super.onBackPressed();
         }
     }
 

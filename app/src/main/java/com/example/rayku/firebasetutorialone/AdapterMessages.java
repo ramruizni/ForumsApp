@@ -22,9 +22,7 @@ public final class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view;
-
         if(viewType==1)
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_sent, parent, false);
         else

@@ -66,7 +66,6 @@ public class ActivityInfo extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 forumTitle = dataSnapshot.child("title").getValue(String.class);
                 description = dataSnapshot.child("description").getValue(String.class);
-                //Toast.makeText(getApplicationContext(), forumTitle, Toast.LENGTH_SHORT).show();
                 titleView.setText(forumTitle);
                 descView.setText(description);
             }

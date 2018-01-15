@@ -6,6 +6,12 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp">
 
+    <TextView
+        android:id="@+id/phantomCheatView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="TextView" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="50dp"
