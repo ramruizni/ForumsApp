@@ -36,7 +36,7 @@ public final class AdapterForums extends RecyclerView.Adapter<AdapterForums.View
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ActivityInfo.class);
-                TextView phantomView = view.findViewById(R.id.phantomCheatView);
+                TextView phantomView = view.findViewById(R.id.phantomIDView);
                 String theCheat = phantomView.getText().toString();
                 intent.putExtra("forumID", theCheat);
                 view.getContext().startActivity(intent);
@@ -67,22 +67,22 @@ public final class AdapterForums extends RecyclerView.Adapter<AdapterForums.View
         private final TextView titleView;
         private final TextView descView;
         private final ImageView imageView;
-        private final TextView phantomCheatView;
+        private final TextView phantomIDView;
 
         static ViewHolder newInstance(View itemView) {
             TextView titleView = itemView.findViewById(R.id.titleView);
             TextView descView = itemView.findViewById(R.id.descView);
             ImageView imageView = itemView.findViewById(R.id.imageView);
-            TextView phantomCheatView = itemView.findViewById(R.id.phantomCheatView);
-            return new ViewHolder(itemView, titleView, descView, imageView, phantomCheatView);
+            TextView phantomIDView = itemView.findViewById(R.id.phantomIDView);
+            return new ViewHolder(itemView, titleView, descView, imageView, phantomIDView);
         }
 
-        private ViewHolder(View itemView, TextView titleView, TextView descView, ImageView imageView, TextView phantomCheatView) {
+        private ViewHolder(View itemView, TextView titleView, TextView descView, ImageView imageView, TextView phantomIDView) {
             super(itemView);
             this.titleView = titleView;
             this.descView = descView;
             this.imageView = imageView;
-            this.phantomCheatView = phantomCheatView;
+            this.phantomIDView = phantomIDView;
         }
 
         void setTitle(String text) {
@@ -111,7 +111,7 @@ public final class AdapterForums extends RecyclerView.Adapter<AdapterForums.View
                 }
             });
         }
-        void setPhantomView(String forumID){ phantomCheatView.setText(forumID); }
+        void setPhantomView(String forumID){ phantomIDView.setText(forumID); }
     }
 
     @Override

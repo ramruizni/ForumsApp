@@ -3,8 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/settings"
+        android:id="@+id/action_profile"
+        android:title="@string/profile"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_forums"
+        android:title="@string/forums"
         app:showAsAction="never" />
 
     <item

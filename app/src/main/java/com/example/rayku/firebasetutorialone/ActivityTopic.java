@@ -115,16 +115,8 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.my_menu, menu);
-        return true;
-    }
-
-    @Override
     public void onClick(View view) {
         switch(view.getId()){
-
             case R.id.emojiBtn:
                 Toast.makeText(this, "Show emojis", Toast.LENGTH_SHORT).show();
                 break;

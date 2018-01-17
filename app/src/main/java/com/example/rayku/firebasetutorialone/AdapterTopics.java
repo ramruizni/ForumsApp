@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,10 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -53,7 +50,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
                 String topicTitle = titleView.getText().toString();
                 intent.putExtra("topicTitle", topicTitle);
 
-                TextView phantomView = view.findViewById(R.id.phantomCheatView);
+                TextView phantomView = view.findViewById(R.id.phantomIDView);
                 String theCheat = phantomView.getText().toString();
                 intent.putExtra("topicID", theCheat);
 
@@ -69,7 +66,6 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         String ID = topicIDs.get(position);
-        Log.i("WTH", ID);
 
         String title = filteredData.get(ID).title;
         String lastMessage = filteredData.get(ID).lastMessage;
@@ -80,7 +76,6 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         holder.setLastMessage(lastMessage);
         holder.setRating(rating);
         holder.cheatTheSystem(phantomCheat);
-
         holder.setImage(phantomCheat, storageReference);
 
     }
@@ -102,7 +97,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             TextView lastMessageView = itemView.findViewById(R.id.lastMessageView);
             TextView ratingView = itemView.findViewById(R.id.ratingView);
             ImageView imageView = itemView.findViewById(R.id.imageView);
-            TextView phantomCheatView = itemView.findViewById(R.id.phantomCheatView);
+            TextView phantomCheatView = itemView.findViewById(R.id.phantomIDView);
             return new ViewHolder(itemView, titleView, lastMessageView, ratingView, imageView, phantomCheatView);
         }
 
@@ -120,6 +115,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             titleView.setText(text);
         }
         public void setLastMessage(String text){ lastMessageView.setText(text); }
+        void setRating(int rating) {
+            ratingView.setText(Integer.toString(rating));
+        }
+        void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
         void setImage(String topicID, StorageReference storageReference){
             String imageKey = topicID+".jpg";
             storageReference.child(imageKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -145,10 +144,6 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             });
 
         }
-        void setRating(int rating) {
-            ratingView.setText(Integer.toString(rating));
-        }
-        void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
 
     }
 

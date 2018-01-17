@@ -13,7 +13,7 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="@android:style/Theme.Holo"
-        app:title="Settings" />
+        app:title="Profile" />
 
     <ImageView
         android:id="@+id/profileImage"

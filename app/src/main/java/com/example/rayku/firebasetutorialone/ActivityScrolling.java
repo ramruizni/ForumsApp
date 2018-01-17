@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -80,8 +79,10 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.action_settings:
+                    case R.id.action_profile:
                         startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
+                        break;
+                    case R.id.action_forums:
                         break;
                     case R.id.action_log_out:
                         FirebaseAuth.getInstance().signOut();
@@ -156,7 +157,6 @@ public class ActivityScrolling extends AppCompatActivity
             public void onPageScrollStateChanged(int state) { }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -351,6 +351,16 @@ public class ActivityScrolling extends AppCompatActivity
                             "to see this text inside a pretty nice box or something.");
             forumsRef.child(forumID).setValue(newForum);
         }
+
+
+        DatabaseReference userNamesRef = database.getReference("userNames");
+        HashMap<String, String> userNames = new HashMap<>();
+        userNames.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", "mister Pimples");
+        userNames.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "Mogatu");
+        userNames.put("7etZQqIhtyM3PcFwchWXkF57wq33", "Oprah");
+        userNames.put("2eHWTwChdDcl7qE1WSMnYOx9Ox53", "Brock Obama");
+        userNamesRef.setValue(userNamesRef);
+
 
 
     }

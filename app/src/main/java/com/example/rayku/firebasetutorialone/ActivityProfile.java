@@ -1,9 +1,7 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -26,16 +24,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.IOException;
-
 public class ActivityProfile extends AppCompatActivity implements View.OnClickListener{
 
     private ImageView profileImage;
     private EditText displayName;
     private Button saveBtn;
     private ProgressBar progressBar;
-    private Uri uriProfileImage;
-    private String profilePicUrl;
+    private Uri imageUri;
+    private String imageDownloadUrl;
     private FirebaseAuth mAuth;
     private static final int CHOOSE_IMAGE = 101;
     private FloatingActionButton camBtn;
@@ -79,7 +75,7 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         if(user!=null) {
             if (user.getPhotoUrl()!=null) {
                 GlideApp.with(this)
-                        .load(user.getPhotoUrl().toString())
+                        .load(user.getPhotoUrl())
                         .circleCrop()
                         .into(profileImage);
             }
@@ -101,24 +97,6 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            uriProfileImage = data.getData();
-            try{
-                //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
-                GlideApp.with(this)
-                        .load(uriProfileImage)
-                        .circleCrop()
-                        .into(profileImage);
-                //profileImage.setImageBitmap(bitmap);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void showImageChooser(){
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -126,24 +104,62 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), CHOOSE_IMAGE);
     }
 
-    private void uploadImageToFirebaseStorage(){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            imageUri = data.getData();
+            try{
+                GlideApp.with(this)
+                        .load(imageUri)
+                        .circleCrop()
+                        .into(profileImage);
 
-        StorageReference profileImageRef = FirebaseStorage.getInstance()
-                .getReference("profileImages/"+
-                        mAuth.getCurrentUser()
-                        .getEmail()
-                        .replace(".", "%")
-                        + ".jpg");
+                uploadImage();
 
-        if(uriProfileImage!=null){
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void saveUserInformation(){
+        String theDisplayName = displayName.getText().toString();
+        if(theDisplayName.isEmpty()){
+            displayName.setError("Name required");
+            displayName.requestFocus();
+            return;
+        }
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user!=null && imageDownloadUrl !=null){
+            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(theDisplayName)
+                    .setPhotoUri(Uri.parse(imageDownloadUrl))
+                    .build();
+            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful())
+                        Toast.makeText(getApplicationContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Something didn't work!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void uploadImage(){
+        StorageReference ref = FirebaseStorage.getInstance().getReference("profileImages/"+mAuth.getUid()+".jpg");
+
+        if(imageUri!=null){
             progressBar.setVisibility(View.VISIBLE);
-            profileImageRef.putFile(uriProfileImage)
+            ref.putFile(imageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressBar.setVisibility(View.GONE);
-                            profilePicUrl=taskSnapshot.getDownloadUrl().toString();
-                            Toast.makeText(getApplicationContext(), "Upload Successful!", Toast.LENGTH_SHORT).show();
+                            imageDownloadUrl = taskSnapshot.getDownloadUrl().toString();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -153,36 +169,6 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
                             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-        }
-
-    }
-
-    public void saveUserInformation(){
-        String theDisplayName = displayName.getText().toString();
-
-        if(theDisplayName.isEmpty()){
-            displayName.setError("Name required");
-            displayName.requestFocus();
-            return;
-        }
-
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        uploadImageToFirebaseStorage();
-
-        if(user!=null && profilePicUrl!=null){
-            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(theDisplayName)
-                    .setPhotoUri(Uri.parse(profilePicUrl))
-                    .build();
-
-            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful())
-                        Toast.makeText(getApplicationContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 
