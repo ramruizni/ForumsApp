@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +29,8 @@ public class ActivityInfo extends AppCompatActivity implements View.OnClickListe
     Button addBtn;
 
     boolean exists;
+
+    FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +99,19 @@ public class ActivityInfo extends AppCompatActivity implements View.OnClickListe
     }
 
     public void addForumToFavorites(){
-        FirebaseDatabase.getInstance().getReference("userForums/"+userID+"/"+forumID).setValue(true);
+        database = FirebaseDatabase.getInstance();
+
+        DatabaseReference forumTitleRef = database.getReference("forums/"+forumID).child("title");
+        forumTitleRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String forumTitle = dataSnapshot.getValue(String.class);
+                database.getReference("userForums/"+userID+"/"+forumID).setValue(new Forum(forumTitle));
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
     }
 
     private void removeForumFromFavorites(){

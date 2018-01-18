@@ -16,7 +16,7 @@
         app:title="Profile" />
 
     <ImageView
-        android:id="@+id/profileImage"
+        android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_below="@+id/toolbar"
@@ -25,10 +25,10 @@
         android:contentDescription="@string/description" />
 
     <EditText
-        android:id="@+id/displayName"
+        android:id="@+id/nameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profileImage"
+        android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="false"
         android:layout_marginTop="20dp"
         android:hint="@string/enter_display_name"
@@ -40,7 +40,7 @@
         android:id="@+id/saveBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/displayName"
+        android:layout_below="@+id/nameTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
         android:text="@string/save"
@@ -52,7 +52,7 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/profileImage"
+        android:layout_alignTop="@+id/imageView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="73dp" />
 
@@ -60,8 +60,8 @@
         android:id="@+id/camBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/displayName"
-        android:layout_alignEnd="@+id/profileImage"
+        android:layout_above="@+id/nameTextView"
+        android:layout_alignEnd="@+id/imageView"
         android:layout_marginBottom="-5dp"
         android:layout_marginEnd="-5dp"
         android:clickable="true"

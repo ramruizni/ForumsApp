@@ -3,8 +3,6 @@ package com.example.rayku.firebasetutorialone;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -53,8 +51,9 @@ public class ActivityScrolling extends AppCompatActivity
     ViewGroup.MarginLayoutParams viewPagerLayoutParams;
     private final int SEARCH_PUSH_MARGIN = 80;
 
-    String currForumID;
+    String currForumID, currForumTitle;
     SharedPreferences sharedPreferences;
+    String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +63,11 @@ public class ActivityScrolling extends AppCompatActivity
         //createFakeDatabase();
 
         sharedPreferences = getApplicationContext().getSharedPreferences("com.example.rayku.firebasetutorialone", Context.MODE_PRIVATE);
+
+        userID = FirebaseAuth.getInstance().getUid();
+
+        currForumID = sharedPreferences.getString(userID+"/currForumID", null);
+        currForumTitle = sharedPreferences.getString(userID+"/currForumTitle", null);
 
         viewPager = findViewById(R.id.viewPager);
         viewPagerLayoutParams = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
@@ -92,8 +96,8 @@ public class ActivityScrolling extends AppCompatActivity
                     case R.id.action_favorites:
                         break;
                     case R.id.action_network_settings:
-                        if(sharedPreferences.getBoolean("loadImages", true)) {
-                            sharedPreferences.edit().putBoolean("loadImages", false).apply();
+                        if(sharedPreferences.getBoolean(userID+"/loadImages", true)) {
+                            sharedPreferences.edit().putBoolean(userID+"/loadImages", false).apply();
                             try {
                                 GlideApp.with(getApplicationContext())
                                         .load(R.color.colorAccent)
@@ -103,7 +107,7 @@ public class ActivityScrolling extends AppCompatActivity
                             }
                         }
                         else
-                            sharedPreferences.edit().putBoolean("loadImages", true).apply();
+                            sharedPreferences.edit().putBoolean(userID+"/loadImages", true).apply();
                         break;
                     case R.id.action_log_out:
                         FirebaseAuth.getInstance().signOut();
@@ -116,7 +120,6 @@ public class ActivityScrolling extends AppCompatActivity
         });
 
         storageRef = FirebaseStorage.getInstance().getReference();
-        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         userForumsRef = FirebaseDatabase.getInstance().getReference("userForums/"+userID);
 
         userForumIDs = new ArrayList<>();
@@ -151,12 +154,19 @@ public class ActivityScrolling extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) { }
         });
 
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 currForumID = userForumIDs.get(position);
-                ctl.setTitle(adapter.getPageTitle(position));
-                if(sharedPreferences.getBoolean("loadImages", true)) {
+                currForumTitle = userForumTitles.get(position);
+
+                sharedPreferences.edit().putString(userID+"/currForumID", currForumID).apply();
+                sharedPreferences.edit().putString(userID+"/currForumTitle", currForumTitle).apply();
+
+                ctl.setTitle(currForumTitle);
+
+                if(sharedPreferences.getBoolean(userID+"/loadImages", true)) {
                     String bgKey = "forumImages/" + userForumIDs.get(position) + ".jpg";
                     storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
@@ -179,6 +189,29 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
+
+        initialTitleSetup();
+
+    }
+
+    private void initialTitleSetup(){
+        ctl.setTitle(currForumTitle);
+        if(sharedPreferences.getBoolean(userID+"/loadImages", true)) {
+            storageRef.child("forumImages/" + currForumID + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    try {
+                        GlideApp.with(getApplicationContext())
+                                .load(uri)
+                                .fitCenter()
+                                .into(titleImageView);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            });
+        }
     }
 
     @Override
@@ -250,14 +283,15 @@ public class ActivityScrolling extends AppCompatActivity
         refForumTopics.setValue(null);
         refTopicMessages.setValue(null);
 
-        HashMap<String, Boolean> userIDs = new HashMap<>();
+        HashMap<String, String> userIDs = new HashMap<>();
         HashMap<String, Integer> forumIDs = new HashMap<>();
         HashMap<String, Boolean> topicIDs = new HashMap<>();
         HashMap<String, Boolean> messageIDs = new HashMap<>();
 
-        userIDs.put("7etZQqIhtyM3PcFwchWXkF57wq33", true);
-        userIDs.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", true);
-        userIDs.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", true);
+        userIDs.put("7etZQqIhtyM3PcFwchWXkF57wq33", "agapeto");
+        userIDs.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "anacleto");
+        userIDs.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", "anastasio");
+        userIDs.put("2eHWTwChdDcl7qE1WSMnYOx9Ox53", "acecilio");
         refUsers.setValue(userIDs);
 
         forumIDs.put("-L2auVWUkz58XFqh5OsZ", 1);
@@ -374,17 +408,6 @@ public class ActivityScrolling extends AppCompatActivity
                             "to see this text inside a pretty nice box or something.");
             forumsRef.child(forumID).setValue(newForum);
         }
-
-
-        DatabaseReference userNamesRef = database.getReference("userNames");
-        HashMap<String, String> userNames = new HashMap<>();
-        userNames.put("cSwlNCbnIpWHJi8Uj5FWz5VOHbB3", "mister Pimples");
-        userNames.put("ak0NfGgAL1PLJeAdlji5Ve0R7Yn2", "Mogatu");
-        userNames.put("7etZQqIhtyM3PcFwchWXkF57wq33", "Oprah");
-        userNames.put("2eHWTwChdDcl7qE1WSMnYOx9Ox53", "Brock Obama");
-        userNamesRef.setValue(userNamesRef);
-
-
 
     }
 

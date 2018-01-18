@@ -13,29 +13,31 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 public class ActivityProfile extends AppCompatActivity implements View.OnClickListener{
 
-    private ImageView profileImage;
-    private EditText displayName;
+    private ImageView imageView;
+    private EditText nameTextView;
     private Button saveBtn;
     private ProgressBar progressBar;
-    private Uri imageUri;
-    private String imageDownloadUrl;
     private FirebaseAuth mAuth;
     private static final int CHOOSE_IMAGE = 101;
     private FloatingActionButton camBtn;
     private Toolbar toolbar;
+    private String userID;
+    private FirebaseDatabase database;
+    private FirebaseStorage storage;
 
     @Override
     protected void onStart() {
@@ -51,8 +53,8 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        profileImage = findViewById(R.id.profileImage);
-        displayName = findViewById(R.id.displayName);
+        imageView = findViewById(R.id.imageView);
+        nameTextView = findViewById(R.id.nameTextView);
         saveBtn = findViewById(R.id.saveBtn);
         progressBar = findViewById(R.id.progressBar);
         camBtn = findViewById(R.id.camBtn);
@@ -67,34 +69,34 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
         progressBar.setVisibility(View.GONE);
 
         mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getUid();
+        database = FirebaseDatabase.getInstance();
+        storage = FirebaseStorage.getInstance();
         loadUserInformation();
     }
 
     private void loadUserInformation() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user!=null) {
-            if (user.getPhotoUrl()!=null) {
-                GlideApp.with(this)
-                        .load(user.getPhotoUrl())
-                        .circleCrop()
-                        .into(profileImage);
-            }
-            if (user.getDisplayName()!=null) {
-                displayName.setText(user.getDisplayName());
-            }
-        }
-    }
 
-    @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case R.id.camBtn:
-                showImageChooser();
-                break;
-            case R.id.saveBtn:
-                saveUserInformation();
-                break;
-        }
+        StorageReference imageRef = storage.getReference("profileImages/"+userID+".jpg");
+        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                GlideApp.with(getApplicationContext())
+                        .load(uri)
+                        .centerCrop()
+                        .into(imageView);
+            }
+        });
+
+        DatabaseReference displayNameRef = database.getReference("users/"+userID);
+        displayNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                nameTextView.setText(dataSnapshot.getValue(String.class));
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
     }
 
     private void showImageChooser(){
@@ -108,14 +110,32 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==CHOOSE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            imageUri = data.getData();
+            Uri imageUri = data.getData();
             try{
                 GlideApp.with(this)
                         .load(imageUri)
                         .circleCrop()
-                        .into(profileImage);
+                        .into(imageView);
 
-                uploadImage();
+                StorageReference ref = FirebaseStorage.getInstance().getReference("profileImages/"+mAuth.getUid()+".jpg");
+
+                if(imageUri!=null){
+                    progressBar.setVisibility(View.VISIBLE);
+                    ref.putFile(imageUri)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    progressBar.setVisibility(View.GONE);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    progressBar.setVisibility(View.GONE);
+                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -124,51 +144,34 @@ public class ActivityProfile extends AppCompatActivity implements View.OnClickLi
     }
 
     public void saveUserInformation(){
-        String theDisplayName = displayName.getText().toString();
+
+        String theDisplayName = nameTextView.getText().toString();
+
         if(theDisplayName.isEmpty()){
-            displayName.setError("Name required");
-            displayName.requestFocus();
+            nameTextView.setError("Name required");
+            nameTextView.requestFocus();
             return;
         }
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user!=null && imageDownloadUrl !=null){
-            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(theDisplayName)
-                    .setPhotoUri(Uri.parse(imageDownloadUrl))
-                    .build();
-            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful())
-                        Toast.makeText(getApplicationContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Toast.makeText(getApplicationContext(), "Something didn't work!", Toast.LENGTH_SHORT).show();
-        }
+        DatabaseReference nameRef = FirebaseDatabase.getInstance().getReference("users/"+userID);
+        nameRef.setValue(theDisplayName).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(getApplicationContext(), "Information updated!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
-    public void uploadImage(){
-        StorageReference ref = FirebaseStorage.getInstance().getReference("profileImages/"+mAuth.getUid()+".jpg");
-
-        if(imageUri!=null){
-            progressBar.setVisibility(View.VISIBLE);
-            ref.putFile(imageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressBar.setVisibility(View.GONE);
-                            imageDownloadUrl = taskSnapshot.getDownloadUrl().toString();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.camBtn:
+                showImageChooser();
+                break;
+            case R.id.saveBtn:
+                saveUserInformation();
+                break;
         }
     }
 

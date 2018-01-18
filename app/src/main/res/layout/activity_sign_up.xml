@@ -21,7 +21,7 @@
 
 
     <EditText
-        android:id="@+id/signEmail"
+        android:id="@+id/emailTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -33,7 +33,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/signPwd"
+        android:id="@+id/pwdTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/emailTextView" />
 
     <Button
         android:id="@+id/signUpBtn"
@@ -55,10 +55,10 @@
         android:text="SIGN UP"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signPwd" />
+        app:layout_constraintTop_toBottomOf="@+id/pwdTextView" />
 
     <TextView
-        android:id="@+id/toLogIn"
+        android:id="@+id/toLogInTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

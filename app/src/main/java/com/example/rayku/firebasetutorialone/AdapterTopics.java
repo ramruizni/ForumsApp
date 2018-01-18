@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +12,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
@@ -28,8 +27,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
     private Context context;
     private StorageReference storageReference;
     SharedPreferences sharedPreferences;
+    private String userID;
 
     AdapterTopics(HashMap<String, Topic> topics, ArrayList<String> topicIDs, String forumID, Context context) {
+        userID = FirebaseAuth.getInstance().getUid();
         sharedPreferences = context.getSharedPreferences("com.example.rayku.firebasetutorialone", Context.MODE_PRIVATE);
         this.topics = topics;
         this.topicIDs = topicIDs;
@@ -75,7 +76,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         int rating = filteredData.get(ID).rating;
         String phantomCheat = filteredData.get(ID).ID;
 
-        Boolean loadImages = sharedPreferences.getBoolean("loadImages", true);
+        Boolean loadImages = sharedPreferences.getBoolean(userID+"/loadImages", true);
 
         holder.setTitle(title);
         holder.setLastMessage(lastMessage);

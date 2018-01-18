@@ -14,10 +14,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ActivitySignup extends AppCompatActivity implements View.OnClickListener{
 
-    private EditText signEmail, signPwd;
+    private EditText emailTextView, pwdTextView;
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
 
@@ -26,11 +27,11 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        signEmail = findViewById(R.id.signEmail);
-        signPwd = findViewById(R.id.signPwd);
+        emailTextView = findViewById(R.id.emailTextView);
+        pwdTextView = findViewById(R.id.pwdTextView);
         progressBar = findViewById(R.id.progressBar);
         findViewById(R.id.signUpBtn).setOnClickListener(this);
-        findViewById(R.id.toLogIn).setOnClickListener(this);
+        findViewById(R.id.toLogInTextView).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
     }
@@ -41,7 +42,7 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
             case(R.id.signUpBtn):
                 registerUser();
                 break;
-            case(R.id.toLogIn):
+            case(R.id.toLogInTextView):
                 finish();
                 startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
                 break;
@@ -52,30 +53,30 @@ public class ActivitySignup extends AppCompatActivity implements View.OnClickLis
 
         progressBar.setVisibility(View.VISIBLE);
 
-        String email = signEmail.getText().toString();
-        String password = signPwd.getText().toString();
+        String email = emailTextView.getText().toString();
+        String password = pwdTextView.getText().toString();
 
         if(email.isEmpty()){
-            signEmail.setError("Email is required");
-            signEmail.requestFocus();
+            emailTextView.setError("Email is required");
+            emailTextView.requestFocus();
             return;
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            signEmail.setError("Enter a valid email");
-            signEmail.requestFocus();
+            emailTextView.setError("Enter a valid email");
+            emailTextView.requestFocus();
             return;
         }
 
         if(password.isEmpty()){
-            signPwd.setError("Password is required");
-            signPwd.requestFocus();
+            pwdTextView.setError("Password is required");
+            pwdTextView.requestFocus();
             return;
         }
 
         if(password.length()<6){
-            signPwd.setError("Minimum length of password should be 6");
-            signPwd.requestFocus();
+            pwdTextView.setError("Minimum length of password should be 6");
+            pwdTextView.requestFocus();
             return;
         }
 

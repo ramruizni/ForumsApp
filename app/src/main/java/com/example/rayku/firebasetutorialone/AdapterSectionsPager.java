@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.util.ArrayList;
 
 public class AdapterSectionsPager extends FragmentPagerAdapter {
