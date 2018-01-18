@@ -1,6 +1,10 @@
 package com.example.rayku.firebasetutorialone;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -50,6 +54,7 @@ public class ActivityScrolling extends AppCompatActivity
     private final int SEARCH_PUSH_MARGIN = 80;
 
     String currForumID;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,8 @@ public class ActivityScrolling extends AppCompatActivity
         setContentView(R.layout.activity_scrolling);
 
         //createFakeDatabase();
+
+        sharedPreferences = getApplicationContext().getSharedPreferences("com.example.rayku.firebasetutorialone", Context.MODE_PRIVATE);
 
         viewPager = findViewById(R.id.viewPager);
         viewPagerLayoutParams = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
@@ -82,7 +89,21 @@ public class ActivityScrolling extends AppCompatActivity
                     case R.id.action_profile:
                         startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
                         break;
-                    case R.id.action_forums:
+                    case R.id.action_favorites:
+                        break;
+                    case R.id.action_network_settings:
+                        if(sharedPreferences.getBoolean("loadImages", true)) {
+                            sharedPreferences.edit().putBoolean("loadImages", false).apply();
+                            try {
+                                GlideApp.with(getApplicationContext())
+                                        .load(R.color.colorAccent)
+                                        .into(titleImageView);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        else
+                            sharedPreferences.edit().putBoolean("loadImages", true).apply();
                         break;
                     case R.id.action_log_out:
                         FirebaseAuth.getInstance().signOut();
@@ -135,21 +156,23 @@ public class ActivityScrolling extends AppCompatActivity
             public void onPageSelected(int position) {
                 currForumID = userForumIDs.get(position);
                 ctl.setTitle(adapter.getPageTitle(position));
-                String bgKey = "forumImages/"+userForumIDs.get(position)+".jpg";
-                storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        try {
-                            GlideApp.with(getApplicationContext())
-                                    .load(uri)
-                                    .fitCenter()
-                                    .into(titleImageView);
-                        } catch(Exception e){
-                            e.printStackTrace();
+                if(sharedPreferences.getBoolean("loadImages", true)) {
+                    String bgKey = "forumImages/" + userForumIDs.get(position) + ".jpg";
+                    storageRef.child(bgKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            try {
+                                GlideApp.with(getApplicationContext())
+                                        .load(uri)
+                                        .fitCenter()
+                                        .into(titleImageView);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
 
-                });
+                    });
+                }
             }
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }

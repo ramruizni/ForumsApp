@@ -2,6 +2,7 @@ package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -26,8 +27,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
     private String forumID;
     private Context context;
     private StorageReference storageReference;
+    SharedPreferences sharedPreferences;
 
     AdapterTopics(HashMap<String, Topic> topics, ArrayList<String> topicIDs, String forumID, Context context) {
+        sharedPreferences = context.getSharedPreferences("com.example.rayku.firebasetutorialone", Context.MODE_PRIVATE);
         this.topics = topics;
         this.topicIDs = topicIDs;
         this.forumID = forumID;
@@ -72,11 +75,13 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
         int rating = filteredData.get(ID).rating;
         String phantomCheat = filteredData.get(ID).ID;
 
+        Boolean loadImages = sharedPreferences.getBoolean("loadImages", true);
+
         holder.setTitle(title);
         holder.setLastMessage(lastMessage);
         holder.setRating(rating);
         holder.cheatTheSystem(phantomCheat);
-        holder.setImage(phantomCheat, storageReference);
+        holder.setImage(phantomCheat, storageReference, loadImages);
 
     }
 
@@ -119,32 +124,26 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
             ratingView.setText(Integer.toString(rating));
         }
         void cheatTheSystem(String omg){ phantomCheatView.setText(omg); }
-        void setImage(String topicID, StorageReference storageReference){
-            String imageKey = topicID+".jpg";
-            storageReference.child(imageKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    try {
-                        GlideApp.with(itemView.getRootView().getContext())
-                                .load(uri)
-                                .fitCenter()
-                                .into(imageView);
-                    } catch(Exception e){
-                        e.printStackTrace();
+        void setImage(String topicID, StorageReference storageReference, Boolean loadImages){
+
+            if(loadImages) {
+                String imageKey = topicID + ".jpg";
+                storageReference.child(imageKey).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        try {
+                            GlideApp.with(itemView.getRootView().getContext())
+                                    .load(uri)
+                                    .fitCenter()
+                                    .into(imageView);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    GlideApp.with(itemView.getRootView().getContext())
-                            .load(R.drawable.topic_bg)
-                            .fitCenter()
-                            .into(imageView);
-                }
-            });
+                });
+            }
 
         }
-
     }
 
     @Override

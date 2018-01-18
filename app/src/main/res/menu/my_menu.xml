@@ -8,9 +8,15 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_forums"
-        android:title="@string/forums"
+        android:id="@+id/action_favorites"
+        android:title="@string/favorites"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_network_settings"
+        android:title="@string/network_settings"
+        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/action_log_out"

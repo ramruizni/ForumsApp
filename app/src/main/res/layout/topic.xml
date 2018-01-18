@@ -43,7 +43,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        app:srcCompat="@drawable/arrow_up" />
+        android:src="@drawable/arrow_up" />
 
     <TextView
         android:id="@+id/ratingView"
@@ -63,7 +63,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="5dp"
-        app:srcCompat="@drawable/arrow_down" />
+        android:src="@drawable/arrow_down" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -71,6 +71,6 @@
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/ratingView"
-        app:srcCompat="@drawable/topic_bg" />
+        android:src="@drawable/topic_bg"/>
 
 </RelativeLayout>

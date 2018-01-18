@@ -1,13 +1,13 @@
 <resources>
     <string name="profile">Profile</string>
-    <string name="forums">Forums</string>
-    <string name="about_us">About us</string>
+    <string name="favorites">Favorites</string>
+    <string name="network_settings">Network settings</string>
+    <string name="log_out">Log out</string>
     <string name="description">description</string>
     <string name="enter_display_name">Enter display Name</string>
     <string name="save">Save</string>
     <string name="tochats">toChats</string>
     <string name="type_a_message">Type a message</string>
-    <string name="log_out">Log out</string>
     <string name="add_forums">To add some forums\nto your list press the\n+ icon on the top.</string>
     <string name="add_topics">To add some talks to\nthis forum press the\n+ sign on the bottom.</string>
     <string name="give_permissions">GIVE PERMISSIONS</string>
