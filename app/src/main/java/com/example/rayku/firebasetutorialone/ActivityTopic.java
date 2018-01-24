@@ -1,15 +1,11 @@
 package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,7 +17,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ActivityTopic extends AppCompatActivity implements View.OnClickListener{
 
@@ -64,6 +63,7 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         messages = new ArrayList<>();
+
         adapter = new AdapterMessages(messages, this, currentUser);
         recyclerView.setAdapter(adapter);
 
@@ -78,10 +78,21 @@ public class ActivityTopic extends AppCompatActivity implements View.OnClickList
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String sender = dataSnapshot.child("sender").getValue(String.class);
-                String content = dataSnapshot.child("content").getValue(String.class);
-                messages.add(new Message(sender, content));
-                adapter.notifyDataSetChanged();
+                final String sender = dataSnapshot.child("sender").getValue(String.class);
+                final String content = dataSnapshot.child("content").getValue(String.class);
+
+                DatabaseReference miniRef = database.getReference("users/"+sender);
+                miniRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String displayName = dataSnapshot.getValue(String.class);
+                        messages.add(new Message(sender, content, displayName));
+                        adapter.notifyDataSetChanged();
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) { }
+                });
+
             }
 
             @Override

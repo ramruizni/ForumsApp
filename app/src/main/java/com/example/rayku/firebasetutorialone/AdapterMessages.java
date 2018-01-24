@@ -2,10 +2,19 @@ package com.example.rayku.firebasetutorialone;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 import java.util.List;
 
 public final class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.ViewHolder> {
@@ -33,9 +42,10 @@ public final class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String sender = messages.get(position).sender;
         String content = messages.get(position).content;
-        holder.setSender(sender);
+        String senderDisplayName = messages.get(position).senderDisplayName;
+
+        holder.setSender(senderDisplayName);
         holder.setContent(content);
     }
 
@@ -72,6 +82,5 @@ public final class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.
         public void setContent(CharSequence content) {
             contentTextView.setText(content);
         }
-
     }
 }
