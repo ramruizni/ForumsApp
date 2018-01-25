@@ -21,19 +21,17 @@ import java.util.HashMap;
 
 public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.ViewHolder> implements Filterable {
 
-    private HashMap<String, Topic> topics, filteredData;
-    private ArrayList<String> topicIDs;
+    private ArrayList<Topic> topics, filteredData;
     private String forumID;
     private Context context;
     private StorageReference storageReference;
     SharedPreferences sharedPreferences;
     private String userID;
 
-    AdapterTopics(HashMap<String, Topic> topics, ArrayList<String> topicIDs, String forumID, Context context) {
+    AdapterTopics(ArrayList<Topic> topics, String forumID, Context context) {
         userID = FirebaseAuth.getInstance().getUid();
         sharedPreferences = context.getSharedPreferences("com.example.rayku.firebasetutorialone", Context.MODE_PRIVATE);
         this.topics = topics;
-        this.topicIDs = topicIDs;
         this.forumID = forumID;
         this.context = context;
         this.storageReference = FirebaseStorage.getInstance().getReference().child("topicImages");
@@ -69,12 +67,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        String ID = topicIDs.get(position);
-
-        String title = filteredData.get(ID).title;
-        String lastMessage = filteredData.get(ID).lastMessage;
-        int rating = filteredData.get(ID).rating;
-        String phantomCheat = filteredData.get(ID).ID;
+        String title = filteredData.get(position).title;
+        String lastMessage = filteredData.get(position).lastMessage;
+        int rating = filteredData.get(position).rating;
+        String phantomCheat = filteredData.get(position).ID;
 
         Boolean loadImages = sharedPreferences.getBoolean(userID+"/loadImages", true);
 
@@ -160,10 +156,10 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
                     filterResults.values = topics;
                     filterResults.count = topics.size();
                 } else{
-                    HashMap<String, Topic> filterResultsData = new HashMap<>();
-                    for(String key : topics.keySet()){
-                        if(topics.get(key).title.toLowerCase().contains(charSequence.toString().toLowerCase())){
-                            filterResultsData.put(key, topics.get(key));
+                    ArrayList<Topic> filterResultsData = new ArrayList<>();
+                    for(Topic topic : topics){
+                        if(topic.title.toLowerCase().contains(charSequence.toString().toLowerCase())){
+                            filterResultsData.add(topic);
                         }
                     }
                     filterResults.values = filterResultsData;
@@ -174,7 +170,7 @@ public final class AdapterTopics extends RecyclerView.Adapter<AdapterTopics.View
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                filteredData = (HashMap<String, Topic>) filterResults.values;
+                filteredData = (ArrayList<Topic>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

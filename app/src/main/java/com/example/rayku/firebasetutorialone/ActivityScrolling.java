@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -19,6 +20,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -50,6 +53,8 @@ public class ActivityScrolling extends AppCompatActivity
     boolean searchViewVisible = false;
     ViewGroup.MarginLayoutParams viewPagerLayoutParams;
     private final int SEARCH_PUSH_MARGIN = 80;
+
+    FragmentForum currFragment;
 
     String currForumID, currForumTitle;
     SharedPreferences sharedPreferences;
@@ -86,38 +91,7 @@ public class ActivityScrolling extends AppCompatActivity
         newTopicBtn.setOnClickListener(this);
 
         setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.action_profile:
-                        startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
-                        break;
-                    case R.id.action_favorites:
-                        break;
-                    case R.id.action_network_settings:
-                        if(sharedPreferences.getBoolean(userID+"/loadImages", true)) {
-                            sharedPreferences.edit().putBoolean(userID+"/loadImages", false).apply();
-                            try {
-                                GlideApp.with(getApplicationContext())
-                                        .load(R.color.colorAccent)
-                                        .into(titleImageView);
-                            } catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-                        else
-                            sharedPreferences.edit().putBoolean(userID+"/loadImages", true).apply();
-                        break;
-                    case R.id.action_log_out:
-                        FirebaseAuth.getInstance().signOut();
-                        finish();
-                        startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
-                        break;
-                }
-                return false;
-            }
-        });
+        toolbar.setOnMenuItemClickListener(new myToolbarMenuClickListener());
 
         storageRef = FirebaseStorage.getInstance().getReference();
         userForumsRef = FirebaseDatabase.getInstance().getReference("userForums/"+userID);
@@ -153,7 +127,6 @@ public class ActivityScrolling extends AppCompatActivity
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
-
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -221,8 +194,6 @@ public class ActivityScrolling extends AppCompatActivity
         return true;
     }
 
-    public SearchView getSearchView(){ return searchView; }
-
     @Override
     public void onClick(View view) {
         switch(view.getId()){
@@ -232,22 +203,13 @@ public class ActivityScrolling extends AppCompatActivity
                 startActivity(intent);
                 break;
             case R.id.midBtn:
-                if(searchViewVisible) {
-                    viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
-                    searchView.setVisibility(View.GONE);
-                    searchViewVisible = false;
-                }
-                else{
-                    searchView.setVisibility(View.VISIBLE);
-                    viewPagerLayoutParams.topMargin += SEARCH_PUSH_MARGIN;
-                    searchViewVisible = true;
-                    searchView.requestFocus();
-
-                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                    assert inputMethodManager != null;
-                    inputMethodManager.toggleSoftInputFromWindow(searchView.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
-                }
+                // this is a cool trick found on:
+                // https://stackoverflow.com/questions/18609261/getting-the-current-fragment-instance-in-the-viewpager
+                Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + viewPager.getCurrentItem());
+                if (currentFragment != null)
+                    ((FragmentForum)currentFragment).popSearchView();
                 break;
+
             case R.id.rightBtn:
                 startActivity(new Intent(getApplicationContext(), ActivitySearchForum.class));
                 break;
@@ -259,12 +221,46 @@ public class ActivityScrolling extends AppCompatActivity
         }
     }
 
+    class myToolbarMenuClickListener implements Toolbar.OnMenuItemClickListener {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.action_profile:
+                    startActivity(new Intent(getApplicationContext(), ActivityProfile.class));
+                    break;
+                case R.id.action_favorites:
+                    break;
+                case R.id.action_network_settings:
+                    if(sharedPreferences.getBoolean(userID+"/loadImages", true)) {
+                        sharedPreferences.edit().putBoolean(userID+"/loadImages", false).apply();
+                        try {
+                            GlideApp.with(getApplicationContext())
+                                    .load(R.color.colorAccent)
+                                    .into(titleImageView);
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                        sharedPreferences.edit().putBoolean(userID+"/loadImages", true).apply();
+                    break;
+                case R.id.action_log_out:
+                    FirebaseAuth.getInstance().signOut();
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), ActivityLogin.class));
+                    break;
+            }
+            return false;
+        }
+    }
+
     @Override
     public void onBackPressed() {
-        if(searchViewVisible){
-            viewPagerLayoutParams.topMargin -= SEARCH_PUSH_MARGIN;
-            searchView.setVisibility(View.GONE);
-            searchViewVisible = false;
+        // this is a cool trick found on:
+        // https://stackoverflow.com/questions/18609261/getting-the-current-fragment-instance-in-the-viewpager
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + viewPager.getCurrentItem());
+        if (currentFragment != null && ((FragmentForum)currentFragment).isSearchViewVisible()) {
+            ((FragmentForum) currentFragment).popSearchView();
         } else{
             super.onBackPressed();
         }
